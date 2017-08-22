@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="containo.us">
+        <link rel="canonical" href="https://docs.traefik.io/user-guide/kv-config/">
+        <link rel="shortcut icon" href="img/traefik.icon.png">
+        
+
+	<title>Key-value store configuration - Træfik</title>
+
+        <link href="../../css/bootstrap-custom.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome-4.0.3.css" rel="stylesheet">
+        <link rel="stylesheet" href="../../css/highlight.css">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link href="../../css/traefik.css" rel="stylesheet">
+
+        <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+            <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+        <![endif]-->
+
+        
+    </head>
+
+    <body>
+
+        <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+
+        <!-- Collapsed navigation -->
+        <div class="navbar-header">
+            <!-- Expander button -->
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+
+            <!-- Main title -->
+            <a class="navbar-brand" href="../..">Træfik</a>
+        </div>
+
+        <!-- Expanded navigation -->
+        <div class="navbar-collapse collapse">
+            <!-- Main navigation -->
+            <ul class="nav navbar-nav">
+            
+            
+                <li >
+                    <a href="../..">Getting Started</a>
+                </li>
+            
+            
+            
+                <li >
+                    <a href="../../basics/">Basics</a>
+                </li>
+            
+            
+            
+                <li >
+                    <a href="../../toml/">traefik.toml</a>
+                </li>
+            
+            
+            
+                <li class="dropdown active">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">User Guide <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                    
+                        
+<li >
+    <a href="../examples/">Configuration examples</a>
+</li>
+
+                    
+                        
+<li >
+    <a href="../swarm/">Swarm cluster</a>
+</li>
+
+                    
+                        
+<li >
+    <a href="../swarm-mode/">Swarm mode cluster</a>
+</li>
+
+                    
+                        
+<li >
+    <a href="../kubernetes/">Kubernetes</a>
+</li>
+
+                    
+                        
+<li >
+    <a href="../marathon/">Marathon</a>
+</li>
+
+                    
+                        
+<li class="active">
+    <a href="./">Key-value store configuration</a>
+</li>
+
+                    
+                        
+<li >
+    <a href="../cluster/">Clustering/HA</a>
+</li>
+
+                    
+                    </ul>
+                </li>
+            
+            
+            
+                <li >
+                    <a href="../../benchmarks/">Benchmarks</a>
+                </li>
+            
+            
+            </ul>
+
+            <!-- Search, Navigation and Repo links -->
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
+                        <i class="fa fa-search"></i> Search
+                    </a>
+                </li>
+                <li >
+                    <a rel="next" href="../marathon/">
+                        <i class="fa fa-arrow-left"></i> Previous
+                    </a>
+                </li>
+                <li >
+                    <a rel="prev" href="../cluster/">
+                        Next <i class="fa fa-arrow-right"></i>
+                    </a>
+                </li>
+                
+                <li>
+                    <a href="https://github.com/containous/traefik">
+                        
+                            <i class="fa fa-github"></i>
+                        
+                        GitHub
+                    </a>
+                </li>
+                
+            </ul>
+        </div>
+    </div>
+</div>
+
+        <div class="container">
+            <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
+    <ul class="nav bs-sidenav">
+    
+        <li class="main active"><a href="#key-value-store-configuration">Key-value store configuration</a></li>
+        
+    
+        <li class="main "><a href="#static-configuration-in-key-value-store">Static configuration in Key-value store</a></li>
+        
+            <li><a href="#docker-compose-file-for-consul">docker-compose file for Consul</a></li>
+        
+            <li><a href="#upload-the-configuration-in-the-key-value-store">Upload the configuration in the Key-value store</a></li>
+        
+            <li><a href="#launch-trfik">Launch Træfik</a></li>
+        
+            <li><a href="#tls-support">TLS support</a></li>
+        
+    
+        <li class="main "><a href="#dynamic-configuration-in-key-value-store">Dynamic configuration in Key-value store</a></li>
+        
+            <li><a href="#key-value-storage-structure">Key-value storage structure</a></li>
+        
+            <li><a href="#atomic-configuration-changes">Atomic configuration changes</a></li>
+        
+    
+        <li class="main "><a href="#store-configuration-in-key-value-store">Store configuration in Key-value store</a></li>
+        
+    
+    </ul>
+</div></div>
+            <div class="col-md-9" role="main">
+
+<h1 id="key-value-store-configuration">Key-value store configuration</h1>
+<p>Both <a href="../../user-guide/kv-config/#static-configuration-in-key-value-store">static global configuration</a> and <a href="../../user-guide/kv-config/#dynamic-configuration-in-key-value-store">dynamic</a> configuration can be sorted in a Key-value store.</p>
+<p>This section explains how to launch Træfik using a configuration loaded from a Key-value store.</p>
+<p>Træfik supports several Key-value stores:</p>
+<ul>
+<li><a href="https://consul.io">Consul</a></li>
+<li><a href="https://coreos.com/etcd/">etcd</a></li>
+<li><a href="https://zookeeper.apache.org/">ZooKeeper</a> </li>
+<li><a href="https://github.com/boltdb/bolt">boltdb</a></li>
+</ul>
+<h1 id="static-configuration-in-key-value-store">Static configuration in Key-value store</h1>
+<p>We will see the steps to set it up with an easy example. 
+Note that we could do the same with any other Key-value Store.</p>
+<h2 id="docker-compose-file-for-consul">docker-compose file for Consul</h2>
+<p>The Træfik global configuration will be getted from a <a href="https://consul.io">Consul</a> store. </p>
+<p>First we have to launch Consul in a container. 
+The <a href="https://docs.docker.com/compose/compose-file/">docker-compose file</a> allows us to launch Consul and four instances of the trivial app <a href="https://github.com/emilevauge/whoamI">emilevauge/whoamI</a> : </p>
+<pre><code class="yaml">consul:
+  image: progrium/consul
+  command: -server -bootstrap -log-level debug -ui-dir /ui
+  ports:
+    - &quot;8400:8400&quot;
+    - &quot;8500:8500&quot;
+    - &quot;8600:53/udp&quot;
+  expose:
+    - &quot;8300&quot;
+    - &quot;8301&quot;
+    - &quot;8301/udp&quot;
+    - &quot;8302&quot;
+    - &quot;8302/udp&quot;  
+
+whoami1:
+  image: emilevauge/whoami
+
+whoami2:
+  image: emilevauge/whoami
+
+whoami3:
+  image: emilevauge/whoami
+
+whoami4:
+  image: emilevauge/whoami
+</code></pre>
+
+<h2 id="upload-the-configuration-in-the-key-value-store">Upload the configuration in the Key-value store</h2>
+<p>We should now fill the store with the Træfik global configuration, as we do with a <a href="../../toml">TOML file configuration</a>.
+To do that, we can send the Key-value pairs via <a href="https://www.consul.io/intro/getting-started/kv.html">curl commands</a> or via the <a href="https://www.consul.io/intro/getting-started/ui.html">Web UI</a>.</p>
+<p>Fortunately, Træfik allows automation of this process using the <code>storeconfig</code> subcommand.
+Please refer to the <a href="../../user-guide/kv-config/#store-configuration-in-key-value-store">store Træfik configuration</a> section to get documentation on it.</p>
+<p>Here is the toml configuration we would like to store in the Key-value Store  :</p>
+<pre><code class="toml">logLevel = &quot;DEBUG&quot;
+
+defaultEntryPoints = [&quot;http&quot;, &quot;https&quot;]
+
+[entryPoints]
+  [entryPoints.http]
+  address = &quot;:80&quot;
+  [entryPoints.https]
+  address = &quot;:443&quot;
+    [entryPoints.https.tls]
+      [[entryPoints.https.tls.certificates]]
+      CertFile = &quot;integration/fixtures/https/snitest.com.cert&quot;
+      KeyFile = &quot;integration/fixtures/https/snitest.com.key&quot;
+      [[entryPoints.https.tls.certificates]]
+      CertFile = &quot;&quot;&quot;-----BEGIN CERTIFICATE-----
+                      &lt;cert file content&gt;
+                      -----END CERTIFICATE-----&quot;&quot;&quot;
+      KeyFile = &quot;&quot;&quot;-----BEGIN CERTIFICATE-----
+                      &lt;key file content&gt;
+                      -----END CERTIFICATE-----&quot;&quot;&quot;
+
+
+[consul]
+  endpoint = &quot;127.0.0.1:8500&quot;
+  watch = true
+  prefix = &quot;traefik&quot;
+
+[web]
+  address = &quot;:8081&quot;
+</code></pre>
+
+<p>And there, the same global configuration in the Key-value Store (using <code>prefix = "traefik"</code>): </p>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/traefik/loglevel</code></td>
+<td><code>DEBUG</code></td>
+</tr>
+<tr>
+<td><code>/traefik/defaultentrypoints/0</code></td>
+<td><code>http</code></td>
+</tr>
+<tr>
+<td><code>/traefik/defaultentrypoints/1</code></td>
+<td><code>https</code></td>
+</tr>
+<tr>
+<td><code>/traefik/entrypoints/http/address</code></td>
+<td><code>:80</code></td>
+</tr>
+<tr>
+<td><code>/traefik/entrypoints/https/address</code></td>
+<td><code>:443</code></td>
+</tr>
+<tr>
+<td><code>/traefik/entrypoints/https/tls/certificates/0/certfile</code></td>
+<td><code>integration/fixtures/https/snitest.com.cert</code></td>
+</tr>
+<tr>
+<td><code>/traefik/entrypoints/https/tls/certificates/0/keyfile</code></td>
+<td><code>integration/fixtures/https/snitest.com.key</code></td>
+</tr>
+<tr>
+<td><code>/traefik/entrypoints/https/tls/certificates/1/certfile</code></td>
+<td><code>--BEGIN CERTIFICATE--&lt;cert file content&gt;--END CERTIFICATE--</code></td>
+</tr>
+<tr>
+<td><code>/traefik/entrypoints/https/tls/certificates/1/keyfile</code></td>
+<td><code>--BEGIN CERTIFICATE--&lt;key file content&gt;--END CERTIFICATE--</code></td>
+</tr>
+<tr>
+<td><code>/traefik/consul/endpoint</code></td>
+<td><code>127.0.0.1:8500</code></td>
+</tr>
+<tr>
+<td><code>/traefik/consul/watch</code></td>
+<td><code>true</code></td>
+</tr>
+<tr>
+<td><code>/traefik/consul/prefix</code></td>
+<td><code>traefik</code></td>
+</tr>
+<tr>
+<td><code>/traefik/web/address</code></td>
+<td><code>:8081</code></td>
+</tr>
+</tbody>
+</table>
+<p>In case you are setting key values manually:
+- Remember to specify the indexes (<code>0</code>,<code>1</code>, <code>2</code>, ... ) under prefixes <code>/traefik/defaultentrypoints/</code> and <code>/traefik/entrypoints/https/tls/certificates/</code> in order to match the global configuration structure.
+- Be careful to give the correct IP address and port on the key <code>/traefik/consul/endpoint</code>.</p>
+<p>Note that we can either give path to certificate file or directly the file content itself.</p>
+<h2 id="launch-trfik">Launch Træfik</h2>
+<p>We will now launch Træfik in a container.
+We use CLI flags to setup the connection between Træfik and Consul.
+All the rest of the global configuration is stored in Consul.</p>
+<p>Here is the <a href="https://docs.docker.com/compose/compose-file/">docker-compose file</a> :</p>
+<pre><code class="yaml">traefik:
+  image: traefik
+  command: --consul --consul.endpoint=127.0.0.1:8500
+  ports:
+    - &quot;80:80&quot;
+    - &quot;8080:8080&quot;
+</code></pre>
+
+<p>NB : Be careful to give the correct IP address and port in the flag <code>--consul.endpoint</code>.</p>
+<h2 id="tls-support">TLS support</h2>
+<p>So far, only <a href="https://consul.io">Consul</a> and <a href="https://coreos.com/etcd/">etcd</a> support TLS connections. 
+To set it up, we should enable <a href="https://www.consul.io/docs/internals/security.html">consul security</a> (or <a href="https://coreos.com/etcd/docs/latest/security.html">etcd security</a>).</p>
+<p>Then, we have to provide CA, Cert and Key to Træfik using <code>consul</code> flags :</p>
+<ul>
+<li><code>--consul.tls</code></li>
+<li><code>--consul.tls.ca=path/to/the/file</code></li>
+<li><code>--consul.tls.cert=path/to/the/file</code></li>
+<li><code>--consul.tls.key=path/to/the/file</code> </li>
+</ul>
+<p>Or etcd flags :</p>
+<ul>
+<li><code>--etcd.tls</code></li>
+<li><code>--etcd.tls.ca=path/to/the/file</code></li>
+<li><code>--etcd.tls.cert=path/to/the/file</code></li>
+<li><code>--etcd.tls.key=path/to/the/file</code></li>
+</ul>
+<p>Note that we can either give directly directly the file content itself (instead of the path to certificate) in a TOML file configuration.</p>
+<p>Remember the command <code>traefik --help</code> to display the updated list of flags.</p>
+<h1 id="dynamic-configuration-in-key-value-store">Dynamic configuration in Key-value store</h1>
+<p>Following our example, we will provide backends/frontends rules to Træfik.</p>
+<p>Note that this section is independent of the way Træfik got its static configuration. 
+It means that the static configuration can either come from the same Key-value store or from any other sources.</p>
+<h2 id="key-value-storage-structure">Key-value storage structure</h2>
+<p>Here is the toml configuration we would like to store in the store :</p>
+<pre><code class="toml">[file]
+
+# rules
+[backends]
+  [backends.backend1]
+    [backends.backend1.circuitbreaker]
+      expression = &quot;NetworkErrorRatio() &gt; 0.5&quot;
+    [backends.backend1.servers.server1]
+    url = &quot;http://172.17.0.2:80&quot;
+    weight = 10
+    [backends.backend1.servers.server2]
+    url = &quot;http://172.17.0.3:80&quot;
+    weight = 1
+  [backends.backend2]
+    [backends.backend1.maxconn]
+      amount = 10
+      extractorfunc = &quot;request.host&quot;
+    [backends.backend2.LoadBalancer]
+      method = &quot;drr&quot;
+    [backends.backend2.servers.server1]
+    url = &quot;http://172.17.0.4:80&quot;
+    weight = 1
+    [backends.backend2.servers.server2]
+    url = &quot;http://172.17.0.5:80&quot;
+    weight = 2
+
+[frontends]
+  [frontends.frontend1]
+  backend = &quot;backend2&quot;
+    [frontends.frontend1.routes.test_1]
+    rule = &quot;Host:test.localhost&quot;
+  [frontends.frontend2]
+  backend = &quot;backend1&quot;
+  passHostHeader = true
+  priority = 10
+  entrypoints = [&quot;https&quot;] # overrides defaultEntryPoints
+    [frontends.frontend2.routes.test_1]
+    rule = &quot;Host:{subdomain:[a-z]+}.localhost&quot;
+  [frontends.frontend3]
+  entrypoints = [&quot;http&quot;, &quot;https&quot;] # overrides defaultEntryPoints
+  backend = &quot;backend2&quot;
+    rule = &quot;Path:/test&quot;
+</code></pre>
+
+<p>And there, the same dynamic configuration in a KV Store (using <code>prefix = "traefik"</code>): </p>
+<ul>
+<li>backend 1</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/traefik/backends/backend1/circuitbreaker/expression</code></td>
+<td><code>NetworkErrorRatio() &gt; 0.5</code></td>
+</tr>
+<tr>
+<td><code>/traefik/backends/backend1/servers/server1/url</code></td>
+<td><code>http://172.17.0.2:80</code></td>
+</tr>
+<tr>
+<td><code>/traefik/backends/backend1/servers/server1/weight</code></td>
+<td><code>10</code></td>
+</tr>
+<tr>
+<td><code>/traefik/backends/backend1/servers/server2/url</code></td>
+<td><code>http://172.17.0.3:80</code></td>
+</tr>
+<tr>
+<td><code>/traefik/backends/backend1/servers/server2/weight</code></td>
+<td><code>1</code></td>
+</tr>
+<tr>
+<td><code>/traefik/backends/backend1/servers/server2/tags</code></td>
+<td><code>api,helloworld</code></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>backend 2</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/traefik/backends/backend2/maxconn/amount</code></td>
+<td><code>10</code></td>
+</tr>
+<tr>
+<td><code>/traefik/backends/backend2/maxconn/extractorfunc</code></td>
+<td><code>request.host</code></td>
+</tr>
+<tr>
+<td><code>/traefik/backends/backend2/loadbalancer/method</code></td>
+<td><code>drr</code></td>
+</tr>
+<tr>
+<td><code>/traefik/backends/backend2/servers/server1/url</code></td>
+<td><code>http://172.17.0.4:80</code></td>
+</tr>
+<tr>
+<td><code>/traefik/backends/backend2/servers/server1/weight</code></td>
+<td><code>1</code></td>
+</tr>
+<tr>
+<td><code>/traefik/backends/backend2/servers/server2/url</code></td>
+<td><code>http://172.17.0.5:80</code></td>
+</tr>
+<tr>
+<td><code>/traefik/backends/backend2/servers/server2/weight</code></td>
+<td><code>2</code></td>
+</tr>
+<tr>
+<td><code>/traefik/backends/backend2/servers/server2/tags</code></td>
+<td><code>web</code></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>frontend 1</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/traefik/frontends/frontend1/backend</code></td>
+<td><code>backend2</code></td>
+</tr>
+<tr>
+<td><code>/traefik/frontends/frontend1/routes/test_1/rule</code></td>
+<td><code>Host:test.localhost</code></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>frontend 2</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/traefik/frontends/frontend2/backend</code></td>
+<td><code>backend1</code></td>
+</tr>
+<tr>
+<td><code>/traefik/frontends/frontend2/passHostHeader</code></td>
+<td><code>true</code></td>
+</tr>
+<tr>
+<td><code>/traefik/frontends/frontend2/priority</code></td>
+<td><code>10</code></td>
+</tr>
+<tr>
+<td><code>/traefik/frontends/frontend2/entrypoints</code></td>
+<td><code>http,https</code></td>
+</tr>
+<tr>
+<td><code>/traefik/frontends/frontend2/routes/test_2/rule</code></td>
+<td><code>PathPrefix:/test</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="atomic-configuration-changes">Atomic configuration changes</h2>
+<p>Træfik can watch the backends/frontends configuration changes and generate its configuration automatically. </p>
+<p>Note that only backends/frontends rules are dynamic, the rest of the Træfik configuration stay static. </p>
+<p>The <a href="https://github.com/coreos/etcd/issues/860">Etcd</a> and <a href="https://github.com/hashicorp/consul/issues/886">Consul</a> backends do not support updating multiple keys atomically. As a result, it may be possible for Træfik to read an intermediate configuration state despite judicious use of the <code>--providersThrottleDuration</code> flag. To solve this problem, Træfik supports a special key called <code>/traefik/alias</code>. If set, Træfik use the value as an alternative key prefix.</p>
+<p>Given the key structure below, Træfik will use the <code>http://172.17.0.2:80</code> as its only backend (frontend keys have been omitted for brevity).</p>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/traefik/alias</code></td>
+<td><code>/traefik_configurations/1</code></td>
+</tr>
+<tr>
+<td><code>/traefik_configurations/1/backends/backend1/servers/server1/url</code></td>
+<td><code>http://172.17.0.2:80</code></td>
+</tr>
+<tr>
+<td><code>/traefik_configurations/1/backends/backend1/servers/server1/weight</code></td>
+<td><code>10</code></td>
+</tr>
+</tbody>
+</table>
+<p>When an atomic configuration change is required, you may write a new configuration at an alternative prefix. Here, although the <code>/traefik_configurations/2/...</code> keys have been set, the old configuration is still active because the <code>/traefik/alias</code> key still points to <code>/traefik_configurations/1</code>:</p>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/traefik/alias</code></td>
+<td><code>/traefik_configurations/1</code></td>
+</tr>
+<tr>
+<td><code>/traefik_configurations/1/backends/backend1/servers/server1/url</code></td>
+<td><code>http://172.17.0.2:80</code></td>
+</tr>
+<tr>
+<td><code>/traefik_configurations/1/backends/backend1/servers/server1/weight</code></td>
+<td><code>10</code></td>
+</tr>
+<tr>
+<td><code>/traefik_configurations/2/backends/backend1/servers/server1/url</code></td>
+<td><code>http://172.17.0.2:80</code></td>
+</tr>
+<tr>
+<td><code>/traefik_configurations/2/backends/backend1/servers/server1/weight</code></td>
+<td><code>5</code></td>
+</tr>
+<tr>
+<td><code>/traefik_configurations/2/backends/backend1/servers/server2/url</code></td>
+<td><code>http://172.17.0.3:80</code></td>
+</tr>
+<tr>
+<td><code>/traefik_configurations/2/backends/backend1/servers/server2/weight</code></td>
+<td><code>5</code></td>
+</tr>
+</tbody>
+</table>
+<p>Once the <code>/traefik/alias</code> key is updated, the new <code>/traefik_configurations/2</code> configuration becomes active atomically. Here, we have a 50% balance between the <code>http://172.17.0.3:80</code> and the <code>http://172.17.0.4:80</code> hosts while no traffic is sent to the <code>172.17.0.2:80</code> host:</p>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/traefik/alias</code></td>
+<td><code>/traefik_configurations/2</code></td>
+</tr>
+<tr>
+<td><code>/traefik_configurations/1/backends/backend1/servers/server1/url</code></td>
+<td><code>http://172.17.0.2:80</code></td>
+</tr>
+<tr>
+<td><code>/traefik_configurations/1/backends/backend1/servers/server1/weight</code></td>
+<td><code>10</code></td>
+</tr>
+<tr>
+<td><code>/traefik_configurations/2/backends/backend1/servers/server1/url</code></td>
+<td><code>http://172.17.0.3:80</code></td>
+</tr>
+<tr>
+<td><code>/traefik_configurations/2/backends/backend1/servers/server1/weight</code></td>
+<td><code>5</code></td>
+</tr>
+<tr>
+<td><code>/traefik_configurations/2/backends/backend1/servers/server2/url</code></td>
+<td><code>http://172.17.0.4:80</code></td>
+</tr>
+<tr>
+<td><code>/traefik_configurations/2/backends/backend1/servers/server2/weight</code></td>
+<td><code>5</code></td>
+</tr>
+</tbody>
+</table>
+<p>Note that Træfik <em>will not watch for key changes in the <code>/traefik_configurations</code> prefix</em>. It will only watch for changes in the <code>/traefik/alias</code>. 
+Further, if the <code>/traefik/alias</code> key is set, all other configuration with <code>/traefik/backends</code> or <code>/traefik/frontends</code> prefix are ignored.</p>
+<h1 id="store-configuration-in-key-value-store">Store configuration in Key-value store</h1>
+<p>Don't forget to <a href="../../user-guide/kv-config/#launch-trfk">setup the connection between Træfik and Key-value store</a>.
+The static Træfik configuration in a key-value store can be automatically created and updated, using the <a href="../../basics/#commands"><code>storeconfig</code> subcommand</a>.</p>
+<pre><code class="bash">$ traefik storeconfig [flags] ...
+</code></pre>
+
+<p>This command is here only to automate the <a href="../../user-guide/kv-config/#upload-the-configuration-in-the-key-value-store">process which upload the configuration into the Key-value store</a>.
+Træfik will not start but the <a href="../../basics/#static-trfk-configuration">static configuration</a> will be uploaded into the Key-value store.
+If you configured ACME (Let's Encrypt), your registration account and your certificates will also be uploaded.</p>
+<p>To upload your ACME certificates to the KV store, get your traefik TOML file and add the new <code>storage</code> option in the <code>acme</code> section:</p>
+<pre><code class="toml">[acme]
+email = &quot;test@traefik.io&quot;
+storage = &quot;traefik/acme/account&quot; # the key where to store your certificates in the KV store
+storageFile = &quot;acme.json&quot; # your old certificates store
+</code></pre>
+
+<p>Call <code>traefik storeconfig</code> to upload your config in the KV store.
+Then remove the line <code>storageFile = "acme.json"</code> from your TOML config file.</p>
+<p>That's it!</p>
+<p><img alt="" src="http://i.giphy.com/ujUdrdpX7Ok5W.gif" /></p></div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+            
+                <center>Copyright &copy; 2016-2017 Containous SAS</center>
+            
+            <center>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</center>
+        </footer>
+
+        <script src="../../js/jquery-1.10.2.min.js"></script>
+        <script src="../../js/bootstrap-3.0.3.min.js"></script>
+        <script src="../../js/highlight.pack.js"></script>
+        <script>var base_url = '../..';</script>
+        <script data-main="../../mkdocs/js/search.js" src="../../mkdocs/js/require.js"></script>
+        <script src="../../js/base.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                        <h4 class="modal-title" id="exampleModalLabel">Search</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p>
+                            From here you can search these documents. Enter
+                            your search terms below.
+                        </p>
+                        <form role="form">
+                            <div class="form-group">
+                                <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query">
+                            </div>
+                        </form>
+                        <div id="mkdocs-search-results"></div>
+                    </div>
+                    <div class="modal-footer">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

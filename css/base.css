@@ -1,0 +1,218 @@
+body {
+    padding-top: 70px;
+}
+
+/*
+ * The code below adds some padding to the top of the current anchor target so
+ * that, when navigating to it, the header isn't hidden by the navbar at the
+ * top. This is especially complicated because we want to *remove* the padding
+ * after navigation so that hovering over the header shows the permalink icon
+ * correctly. Thus, we create a CSS animation to remove the extra padding after
+ * a second. We have two animations so that navigating to an anchor within the
+ * page always restarts the animation.
+ *
+ * See <https://github.com/mkdocs/mkdocs/issues/843> for more details.
+ */
+:target::before {
+    content: "";
+    display: block;
+    margin-top: -75px;
+    height: 75px;
+    pointer-events: none;
+    animation: 0s 1s forwards collapse-anchor-padding-1;
+}
+
+body.clicky :target::before {
+    animation-name: collapse-anchor-padding-2;
+}
+
+@keyframes collapse-anchor-padding-1 {
+    to {
+        margin-top: 0;
+        height: 0;
+    }
+}
+
+@keyframes collapse-anchor-padding-2 {
+    to {
+        margin-top: 0;
+        height: 0;
+    }
+}
+
+ul.nav li.main {
+    font-weight: bold;
+}
+
+div.col-md-3 {
+    padding-left: 0;
+}
+
+div.col-md-9 {
+    padding-bottom: 100px;
+}
+
+div.source-links {
+    float: right;
+}
+
+div.col-md-9 img {
+    max-width: 100%;
+}
+
+code {
+    padding: 1px 3px;
+    background: #f5f5f5;
+    border: solid 1px #ccc;
+    color: #333;
+}
+
+pre code {
+    background: transparent;
+    border: none;
+}
+
+a > code {
+    color: #dd4814;
+}
+
+a > code:hover, a > code:focus {
+    color: #97310e;
+}
+
+/*
+ * Side navigation
+ *
+ * Scrollspy and affixed enhanced navigation to highlight sections and secondary
+ * sections of docs content.
+ */
+
+/* By default it's not affixed in mobile views, so undo that */
+.bs-sidebar.affix {
+    position: static;
+}
+
+.bs-sidebar.well {
+    padding: 0;
+}
+
+/* First level of nav */
+.bs-sidenav {
+    margin-top: 30px;
+    margin-bottom: 30px;
+    padding-top:    10px;
+    padding-bottom: 10px;
+    border-radius: 5px;
+}
+
+/* All levels of nav */
+.bs-sidebar .nav > li > a {
+    display: block;
+    padding: 5px 20px;
+    z-index: 1;
+}
+.bs-sidebar .nav > li > a:hover,
+.bs-sidebar .nav > li > a:focus {
+    text-decoration: none;
+    border-right: 1px solid;
+}
+.bs-sidebar .nav > .active > a,
+.bs-sidebar .nav > .active:hover > a,
+.bs-sidebar .nav > .active:focus > a {
+    font-weight: bold;
+    background-color: transparent;
+    border-right: 1px solid;
+}
+
+/* Nav: second level (shown on .active) */
+.bs-sidebar .nav .nav {
+    display: none; /* Hide by default, but at >768px, show it */
+    margin-bottom: 8px;
+}
+.bs-sidebar .nav .nav > li > a {
+    padding-top:    3px;
+    padding-bottom: 3px;
+    padding-left: 30px;
+    font-size: 90%;
+}
+
+/* Show and affix the side nav when space allows it */
+@media (min-width: 992px) {
+    .bs-sidebar .nav > .active > ul {
+        display: block;
+    }
+    /* Widen the fixed sidebar */
+    .bs-sidebar.affix,
+    .bs-sidebar.affix-bottom {
+        width: 213px;
+    }
+    .bs-sidebar.affix {
+        position: fixed; /* Undo the static from mobile first approach */
+        top: 80px;
+    }
+    .bs-sidebar.affix-bottom {
+        position: absolute; /* Undo the static from mobile first approach */
+    }
+    .bs-sidebar.affix-bottom .bs-sidenav,
+    .bs-sidebar.affix .bs-sidenav {
+        margin-top: 0;
+        margin-bottom: 0;
+    }
+}
+@media (min-width: 1200px) {
+    /* Widen the fixed sidebar again */
+    .bs-sidebar.affix-bottom,
+    .bs-sidebar.affix {
+        width: 263px;
+    }
+}
+
+.headerlink {
+    display: none;
+    padding-left: .5em;
+}
+
+h1:hover .headerlink, h2:hover .headerlink, h3:hover .headerlink, h4:hover .headerlink, h5:hover .headerlink, h6:hover .headerlink{
+    display:inline-block;
+}
+
+/* display submenu relative to parent*/
+.dropdown-submenu {
+    position: relative;
+}
+
+/* sub menu stlye */
+.dropdown-submenu>.dropdown-menu {
+    top: 0;
+    left: 100%;
+    margin-top: 0px;
+    margin-left: -1px;
+    -webkit-border-radius: 0 4px 4px 4px;
+    -moz-border-radius: 0 4px 4px;
+    border-radius: 0 4px 4px 4px;
+}
+
+/* display sub menu on hover*/
+.dropdown-submenu:hover>.dropdown-menu {
+    display: block;
+}
+
+/* little arrow */
+.dropdown-submenu>a:after {
+    display: block;
+    content: " ";
+    float: right;
+    width: 0;
+    height: 0;
+    border-color: transparent;
+    border-style: solid;
+    border-width: 5px 0 5px 5px;
+    border-left-color: #ccc;
+    margin-top: 5px;
+    margin-right: -10px;
+}
+
+/* little arrow of parent menu */
+.dropdown-submenu:hover>a:after {
+    border-left-color: #404040;
+}

@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="containo.us">
+        <link rel="canonical" href="https://docs.traefik.io/user-guide/kubernetes/">
+        <link rel="shortcut icon" href="img/traefik.icon.png">
+        
+
+	<title>Kubernetes - Træfik</title>
+
+        <link href="../../css/bootstrap-custom.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome-4.0.3.css" rel="stylesheet">
+        <link rel="stylesheet" href="../../css/highlight.css">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link href="../../css/traefik.css" rel="stylesheet">
+
+        <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+            <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+        <![endif]-->
+
+        
+    </head>
+
+    <body>
+
+        <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+
+        <!-- Collapsed navigation -->
+        <div class="navbar-header">
+            <!-- Expander button -->
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+
+            <!-- Main title -->
+            <a class="navbar-brand" href="../..">Træfik</a>
+        </div>
+
+        <!-- Expanded navigation -->
+        <div class="navbar-collapse collapse">
+            <!-- Main navigation -->
+            <ul class="nav navbar-nav">
+            
+            
+                <li >
+                    <a href="../..">Getting Started</a>
+                </li>
+            
+            
+            
+                <li >
+                    <a href="../../basics/">Basics</a>
+                </li>
+            
+            
+            
+                <li >
+                    <a href="../../toml/">traefik.toml</a>
+                </li>
+            
+            
+            
+                <li class="dropdown active">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">User Guide <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                    
+                        
+<li >
+    <a href="../examples/">Configuration examples</a>
+</li>
+
+                    
+                        
+<li >
+    <a href="../swarm/">Swarm cluster</a>
+</li>
+
+                    
+                        
+<li >
+    <a href="../swarm-mode/">Swarm mode cluster</a>
+</li>
+
+                    
+                        
+<li class="active">
+    <a href="./">Kubernetes</a>
+</li>
+
+                    
+                        
+<li >
+    <a href="../marathon/">Marathon</a>
+</li>
+
+                    
+                        
+<li >
+    <a href="../kv-config/">Key-value store configuration</a>
+</li>
+
+                    
+                        
+<li >
+    <a href="../cluster/">Clustering/HA</a>
+</li>
+
+                    
+                    </ul>
+                </li>
+            
+            
+            
+                <li >
+                    <a href="../../benchmarks/">Benchmarks</a>
+                </li>
+            
+            
+            </ul>
+
+            <!-- Search, Navigation and Repo links -->
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
+                        <i class="fa fa-search"></i> Search
+                    </a>
+                </li>
+                <li >
+                    <a rel="next" href="../swarm-mode/">
+                        <i class="fa fa-arrow-left"></i> Previous
+                    </a>
+                </li>
+                <li >
+                    <a rel="prev" href="../marathon/">
+                        Next <i class="fa fa-arrow-right"></i>
+                    </a>
+                </li>
+                
+                <li>
+                    <a href="https://github.com/containous/traefik">
+                        
+                            <i class="fa fa-github"></i>
+                        
+                        GitHub
+                    </a>
+                </li>
+                
+            </ul>
+        </div>
+    </div>
+</div>
+
+        <div class="container">
+            <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
+    <ul class="nav bs-sidenav">
+    
+        <li class="main active"><a href="#kubernetes-ingress-controller">Kubernetes Ingress Controller</a></li>
+        
+            <li><a href="#prerequisites">Prerequisites</a></li>
+        
+            <li><a href="#deploy-trfik-using-a-deployment-object">Deploy Træfik using a Deployment object</a></li>
+        
+            <li><a href="#deploy-trfik-using-helm-chart">Deploy Træfik using Helm Chart</a></li>
+        
+            <li><a href="#submitting-an-ingress-to-the-cluster">Submitting An Ingress to the cluster.</a></li>
+        
+            <li><a href="#name-based-routing">Name based routing</a></li>
+        
+            <li><a href="#path-based-routing">Path based routing</a></li>
+        
+            <li><a href="#disable-passing-the-host-header">Disable passing the Host header</a></li>
+        
+            <li><a href="#excluding-an-ingress-from-trfik">Excluding an ingress from Træfik</a></li>
+        
+    
+    </ul>
+</div></div>
+            <div class="col-md-9" role="main">
+
+<h1 id="kubernetes-ingress-controller">Kubernetes Ingress Controller</h1>
+<p>This guide explains how to use Træfik as an Ingress controller in a Kubernetes cluster.
+If you are not familiar with Ingresses in Kubernetes you might want to read the <a href="http://kubernetes.io/docs/user-guide/ingress/">Kubernetes user guide</a></p>
+<p>The config files used in this guide can be found in the <a href="https://github.com/containous/traefik/tree/master/examples/k8s">examples directory</a></p>
+<h2 id="prerequisites">Prerequisites</h2>
+<ol>
+<li>
+<p>A working Kubernetes cluster. If you want to follow along with this guide, you should setup <a href="http://kubernetes.io/docs/getting-started-guides/minikube/">minikube</a>
+on your machine, as it is the quickest way to get a local Kubernetes cluster setup for experimentation and development.</p>
+</li>
+<li>
+<p>The <code>kubectl</code> binary should be <a href="http://kubernetes.io/docs/getting-started-guides/minikube/#download-kubectl">installed on your workstation</a>.</p>
+</li>
+</ol>
+<h3 id="role-based-access-control-configuration-kubernetes-16-only">Role Based Access Control configuration (Kubernetes 1.6+ only)</h3>
+<p>Kubernetes introduces <a href="https://kubernetes.io/docs/admin/authorization/rbac/">Role Based Access Control (RBAC)</a> in 1.6+ to allow fine-grained control
+of Kubernetes resources and api.</p>
+<p>If your cluster is configured with RBAC, you may need to authorize Traefik to use
+kubernetes API using ClusterRole and ClusterRoleBinding resources:</p>
+<p><em>Note: your cluster may have suitable ClusterRoles already setup, but the following should work everywhere</em></p>
+<pre><code class="yaml">---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: traefik-ingress-controller
+rules:
+  - apiGroups:
+      - &quot;&quot;
+    resources:
+      - pods
+      - services
+      - endpoints
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - extensions
+    resources:
+      - ingresses
+    verbs:
+      - get
+      - list
+      - watch
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: traefik-ingress-controller
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: traefik-ingress-controller
+subjects:
+- kind: ServiceAccount
+  name: traefik-ingress-controller
+  namespace: kube-system
+</code></pre>
+
+<p><a href="https://github.com/containous/traefik/tree/master/examples/k8s/traefik-rbac.yaml">examples/k8s/traefik-rbac.yaml</a></p>
+<pre><code class="shell">kubectl apply -f https://raw.githubusercontent.com/containous/traefik/master/examples/k8s/traefik-rbac.yaml
+</code></pre>
+
+<h2 id="deploy-trfik-using-a-deployment-object">Deploy Træfik using a Deployment object</h2>
+<p>We are going to deploy Træfik with a
+<a href="http://kubernetes.io/docs/user-guide/deployments/">Deployment</a>, as this will
+allow you to easily roll out config changes or update the image.</p>
+<pre><code class="yaml">---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: traefik-ingress-controller
+  namespace: kube-system
+---
+kind: Deployment
+apiVersion: extensions/v1beta1
+metadata:
+  name: traefik-ingress-controller
+  namespace: kube-system
+  labels:
+    k8s-app: traefik-ingress-lb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      k8s-app: traefik-ingress-lb
+  template:
+    metadata:
+      labels:
+        k8s-app: traefik-ingress-lb
+        name: traefik-ingress-lb
+    spec:
+      serviceAccountName: traefik-ingress-controller
+      terminationGracePeriodSeconds: 60
+      containers:
+      - image: traefik
+        name: traefik-ingress-lb
+        resources:
+          limits:
+            cpu: 200m
+            memory: 30Mi
+          requests:
+            cpu: 100m
+            memory: 20Mi
+        ports:
+        - containerPort: 80
+          hostPort: 80
+        - containerPort: 8080
+        args:
+        - --web
+        - --kubernetes
+</code></pre>
+
+<p><a href="https://github.com/containous/traefik/tree/master/examples/k8s/traefik.yaml">examples/k8s/traefik.yaml</a></p>
+<blockquote>
+<p>notice that we binding port 80 on the Træfik container to port 80 on the host.
+With a multi node cluster we might expose Træfik with a NodePort or LoadBalancer service
+and run more than 1 replica of Træfik for high availability.</p>
+</blockquote>
+<p>To deploy Træfik to your cluster start by submitting the deployment to the cluster with <code>kubectl</code>:</p>
+<pre><code class="shell">kubectl apply -f https://raw.githubusercontent.com/containous/traefik/master/examples/k8s/traefik.yaml
+</code></pre>
+
+<h3 id="check-the-deployment">Check the deployment</h3>
+<p>Now lets check if our deployment was successful.</p>
+<p>Start by listing the pods in the <code>kube-system</code> namespace:</p>
+<pre><code class="shell">$kubectl --namespace=kube-system get pods
+
+NAME                                         READY     STATUS    RESTARTS   AGE
+kube-addon-manager-minikubevm                1/1       Running   0          4h
+kubernetes-dashboard-s8krj                   1/1       Running   0          4h
+traefik-ingress-controller-678226159-eqseo   1/1       Running   0          7m
+</code></pre>
+
+<p>You should see that after submitting the Deployment to Kubernetes it has launched
+a pod, and it is now running. <em>It might take a few moments for kubernetes to pull
+the Træfik image and start the container.</em></p>
+<blockquote>
+<p>You could also check the deployment with the Kubernetes dashboard, run
+<code>minikube dashboard</code> to open it in your browser, then choose the <code>kube-system</code>
+namespace from the menu at the top right of the screen.</p>
+</blockquote>
+<p>You should now be able to access Træfik on port 80 of your minikube instance.</p>
+<pre><code class="sh">curl $(minikube ip)
+404 page not found
+</code></pre>
+
+<blockquote>
+<p>We expect to see a 404 response here as we haven't yet given Træfik any configuration.</p>
+</blockquote>
+<h2 id="deploy-trfik-using-helm-chart">Deploy Træfik using Helm Chart</h2>
+<p>Instead of installing Træfik via a Deployment object, you can also use the Træfik Helm chart.</p>
+<p>Install Træfik chart by:</p>
+<pre><code class="sh">helm install stable/traefik
+</code></pre>
+
+<p>For more information, check out <a href="https://github.com/kubernetes/charts/tree/master/stable/traefik">the doc</a>.</p>
+<h2 id="submitting-an-ingress-to-the-cluster">Submitting An Ingress to the cluster.</h2>
+<p>Lets start by creating a Service and an Ingress that will expose the
+<a href="https://github.com/containous/traefik#web-ui">Træfik Web UI</a>.</p>
+<pre><code class="yaml">apiVersion: v1
+kind: Service
+metadata:
+  name: traefik-web-ui
+  namespace: kube-system
+spec:
+  selector:
+    k8s-app: traefik-ingress-lb
+  ports:
+  - port: 80
+    targetPort: 8080
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: traefik-web-ui
+  namespace: kube-system
+  annotations:
+    kubernetes.io/ingress.class: traefik
+spec:
+  rules:
+  - host: traefik-ui.local
+    http:
+      paths:
+      - backend:
+          serviceName: traefik-web-ui
+          servicePort: 80
+</code></pre>
+
+<p><a href="https://github.com/containous/traefik/tree/master/examples/k8s/ui.yaml">examples/k8s/ui.yaml</a></p>
+<pre><code class="shell">kubectl apply -f https://raw.githubusercontent.com/containous/traefik/master/examples/k8s/ui.yaml
+</code></pre>
+
+<p>Now lets setup an entry in our /etc/hosts file to route <code>traefik-ui.local</code>
+to our cluster.</p>
+<blockquote>
+<p>In production you would want to set up real dns entries.</p>
+<p>You can get the ip address of your minikube instance by running <code>minikube ip</code></p>
+</blockquote>
+<pre><code class="shell">echo &quot;$(minikube ip) traefik-ui.local&quot; | sudo tee -a /etc/hosts
+</code></pre>
+
+<p>We should now be able to visit <a href="http://traefik-ui.local">traefik-ui.local</a> in the browser and view the Træfik Web UI.</p>
+<h2 id="name-based-routing">Name based routing</h2>
+<p>In this example we are going to setup websites for 3 of the United Kingdoms
+best loved cheeses, Cheddar, Stilton and Wensleydale.</p>
+<p>First lets start by launching the 3 pods for the cheese websites.</p>
+<pre><code class="yaml">---
+kind: Deployment
+apiVersion: extensions/v1beta1
+metadata:
+  name: stilton
+  labels:
+    app: cheese
+    cheese: stilton
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: cheese
+      task: stilton
+  template:
+    metadata:
+      labels:
+        app: cheese
+        task: stilton
+        version: v0.0.1
+    spec:
+      containers:
+      - name: cheese
+        image: errm/cheese:stilton
+        resources:
+          requests:
+            cpu: 100m
+            memory: 50Mi
+          limits:
+            cpu: 100m
+            memory: 50Mi
+        ports:
+        - containerPort: 80
+---
+kind: Deployment
+apiVersion: extensions/v1beta1
+metadata:
+  name: cheddar
+  labels:
+    app: cheese
+    cheese: cheddar
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: cheese
+      task: cheddar
+  template:
+    metadata:
+      labels:
+        app: cheese
+        task: cheddar
+        version: v0.0.1
+    spec:
+      containers:
+      - name: cheese
+        image: errm/cheese:cheddar
+        resources:
+          requests:
+            cpu: 100m
+            memory: 50Mi
+          limits:
+            cpu: 100m
+            memory: 50Mi
+        ports:
+        - containerPort: 80
+---
+kind: Deployment
+apiVersion: extensions/v1beta1
+metadata:
+  name: wensleydale
+  labels:
+    app: cheese
+    cheese: wensleydale
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: cheese
+      task: wensleydale
+  template:
+    metadata:
+      labels:
+        app: cheese
+        task: wensleydale
+        version: v0.0.1
+    spec:
+      containers:
+      - name: cheese
+        image: errm/cheese:wensleydale
+        resources:
+          requests:
+            cpu: 100m
+            memory: 50Mi
+          limits:
+            cpu: 100m
+            memory: 50Mi
+        ports:
+        - containerPort: 80
+</code></pre>
+
+<p><a href="https://github.com/containous/traefik/tree/master/examples/k8s/cheese-deployments.yaml">examples/k8s/cheese-deployments.yaml</a></p>
+<pre><code class="shell">kubectl apply -f https://raw.githubusercontent.com/containous/traefik/master/examples/k8s/cheese-deployments.yaml
+</code></pre>
+
+<p>Next we need to setup a service for each of the cheese pods.</p>
+<pre><code class="yaml">---
+apiVersion: v1
+kind: Service
+metadata:
+  name: stilton
+spec:
+  ports:
+  - name: http
+    targetPort: 80
+    port: 80
+  selector:
+    app: cheese
+    task: stilton
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cheddar
+spec:
+  ports:
+  - name: http
+    targetPort: 80
+    port: 80
+  selector:
+    app: cheese
+    task: cheddar
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: wensleydale
+  annotations:
+    traefik.backend.circuitbreaker: &quot;NetworkErrorRatio() &gt; 0.5&quot;
+spec:
+  ports:
+  - name: http
+    targetPort: 80
+    port: 80
+  selector:
+    app: cheese
+    task: wensleydale
+</code></pre>
+
+<blockquote>
+<p>Notice that we also set a <a href="https://docs.traefik.io/basics/#backends">circuit breaker expression</a> for one of the backends
+by setting the <code>traefik.backend.circuitbreaker</code> annotation on the service.</p>
+</blockquote>
+<p><a href="https://github.com/containous/traefik/tree/master/examples/k8s/cheese-services.yaml">examples/k8s/cheese-services.yaml</a></p>
+<pre><code class="shell">kubectl apply -f https://raw.githubusercontent.com/containous/traefik/master/examples/k8s/cheese-services.yaml
+</code></pre>
+
+<p>Now we can submit an ingress for the cheese websites.</p>
+<pre><code class="yaml">apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: cheese
+  annotations:
+    kubernetes.io/ingress.class: traefik
+spec:
+  rules:
+  - host: stilton.local
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: stilton
+          servicePort: http
+  - host: cheddar.local
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: cheddar
+          servicePort: http
+  - host: wensleydale.local
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: wensleydale
+          servicePort: http
+</code></pre>
+
+<p><a href="https://github.com/containous/traefik/tree/master/examples/k8s/cheese-ingress.yaml">examples/k8s/cheese-ingress.yaml</a></p>
+<blockquote>
+<p>Notice that we list each hostname, and add a backend service.</p>
+</blockquote>
+<pre><code class="shell">kubectl apply -f https://raw.githubusercontent.com/containous/traefik/master/examples/k8s/cheese-ingress.yaml
+</code></pre>
+
+<p>Now visit the <a href="http://traefik-ui.local/">Træfik dashboard</a> and you should
+see a frontend for each host. Along with a backend listing for each service
+with a Server set up for each pod.</p>
+<p>If you edit your <code>/etc/hosts</code> again you should be able to access the cheese
+websites in your browser.</p>
+<pre><code class="shell">echo &quot;$(minikube ip) stilton.local cheddar.local wensleydale.local&quot; | sudo tee -a /etc/hosts
+</code></pre>
+
+<ul>
+<li><a href="http://stilton.local/">Stilton</a></li>
+<li><a href="http://cheddar.local/">Cheddar</a></li>
+<li><a href="http://wensleydale.local/">Wensleydale</a></li>
+</ul>
+<h2 id="path-based-routing">Path based routing</h2>
+<p>Now lets suppose that our fictional client has decided that while they are
+super happy about our cheesy web design, when they asked for 3 websites
+they had not really bargained on having to buy 3 domain names.</p>
+<p>No problem, we say, why don't we reconfigure the sites to host all 3 under one domain.</p>
+<pre><code class="yaml">apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: cheeses
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    traefik.frontend.rule.type: PathPrefixStrip
+spec:
+  rules:
+  - host: cheeses.local
+    http:
+      paths:
+      - path: /stilton
+        backend:
+          serviceName: stilton
+          servicePort: http
+      - path: /cheddar
+        backend:
+          serviceName: cheddar
+          servicePort: http
+      - path: /wensleydale
+        backend:
+          serviceName: wensleydale
+          servicePort: http
+</code></pre>
+
+<p><a href="https://github.com/containous/traefik/tree/master/examples/k8s/cheeses-ingress.yaml">examples/k8s/cheeses-ingress.yaml</a></p>
+<blockquote>
+<p>Notice that we are configuring Træfik to strip the prefix from the url path
+with the <code>traefik.frontend.rule.type</code> annotation so that we can use
+the containers from the previous example without modification.</p>
+</blockquote>
+<pre><code class="shell">kubectl apply -f https://raw.githubusercontent.com/containous/traefik/master/examples/k8s/cheeses-ingress.yaml
+</code></pre>
+
+<pre><code class="shell">echo &quot;$(minikube ip) cheeses.local&quot; | sudo tee -a /etc/hosts
+</code></pre>
+
+<p>You should now be able to visit the websites in your browser.</p>
+<ul>
+<li><a href="http://cheeses.local/stilton/">cheeses.local/stilton</a></li>
+<li><a href="http://cheeses.local/cheddar/">cheeses.local/cheddar</a></li>
+<li><a href="http://cheeses.local/wensleydale/">cheeses.local/wensleydale</a></li>
+</ul>
+<h2 id="disable-passing-the-host-header">Disable passing the Host header</h2>
+<p>By default Træfik will pass the incoming Host header on to the upstream resource.
+There are times however where you may not want this to be the case.
+For example if your service is of the ExternalName type.</p>
+<h3 id="disable-entirely">Disable entirely</h3>
+<p>Add the following to your toml config:</p>
+<pre><code class="toml">disablePassHostHeaders = true
+</code></pre>
+
+<h3 id="disable-per-ingress">Disable per ingress</h3>
+<p>To disable passing the Host header per ingress resource set the <code>traefik.frontend.passHostHeader</code>
+annotation on your ingress to <code>false</code>.</p>
+<p>Here is an example ingress definition:</p>
+<pre><code class="yaml">apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: example
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    traefik.frontend.passHostHeader: &quot;false&quot;
+spec:
+  rules:
+  - host: example.com
+    http:
+      paths:
+      - path: /static
+        backend:
+          serviceName: static
+          servicePort: https
+</code></pre>
+
+<p>And an example service definition:</p>
+<pre><code class="yaml">apiVersion: v1
+kind: Service
+metadata:
+  name: static
+spec:
+  ports:
+  - name: https
+    port: 443
+  type: ExternalName
+  externalName: static.otherdomain.com
+</code></pre>
+
+<p>If you were to visit example.com/static the request would then be passed onto
+static.otherdomain.com/static and static.otherdomain.com would receive the
+request with the Host header being static.otherdomain.com.</p>
+<p>Note: The per ingress annotation overides whatever the global value is set to.
+So you could set <code>disablePassHostHeaders</code> to <code>true</code> in your toml file and then enable passing 
+the host header per ingress if you wanted.</p>
+<h2 id="excluding-an-ingress-from-trfik">Excluding an ingress from Træfik</h2>
+<p>You can control which ingress Træfik cares about by using the <code>kubernetes.io/ingress.class</code> annotation.
+By default if the annotation is not set at all Træfik will include the ingress.
+If the annotation is set to anything other than traefik or a blank string Træfik will ignore it.</p>
+<p><img alt="" src="http://i.giphy.com/ujUdrdpX7Ok5W.gif" /></p></div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+            
+                <center>Copyright &copy; 2016-2017 Containous SAS</center>
+            
+            <center>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</center>
+        </footer>
+
+        <script src="../../js/jquery-1.10.2.min.js"></script>
+        <script src="../../js/bootstrap-3.0.3.min.js"></script>
+        <script src="../../js/highlight.pack.js"></script>
+        <script>var base_url = '../..';</script>
+        <script data-main="../../mkdocs/js/search.js" src="../../mkdocs/js/require.js"></script>
+        <script src="../../js/base.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                        <h4 class="modal-title" id="exampleModalLabel">Search</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p>
+                            From here you can search these documents. Enter
+                            your search terms below.
+                        </p>
+                        <form role="form">
+                            <div class="form-group">
+                                <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query">
+                            </div>
+                        </form>
+                        <div id="mkdocs-search-results"></div>
+                    </div>
+                    <div class="modal-footer">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

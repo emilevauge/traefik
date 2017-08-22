@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="containo.us">
+        <link rel="canonical" href="https://docs.traefik.io/benchmarks/">
+        <link rel="shortcut icon" href="img/traefik.icon.png">
+        
+
+	<title>Benchmarks - Træfik</title>
+
+        <link href="../css/bootstrap-custom.min.css" rel="stylesheet">
+        <link href="../css/font-awesome-4.0.3.css" rel="stylesheet">
+        <link rel="stylesheet" href="../css/highlight.css">
+        <link href="../css/base.css" rel="stylesheet">
+        <link href="../css/traefik.css" rel="stylesheet">
+
+        <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+            <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+        <![endif]-->
+
+        
+    </head>
+
+    <body>
+
+        <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+
+        <!-- Collapsed navigation -->
+        <div class="navbar-header">
+            <!-- Expander button -->
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+
+            <!-- Main title -->
+            <a class="navbar-brand" href="..">Træfik</a>
+        </div>
+
+        <!-- Expanded navigation -->
+        <div class="navbar-collapse collapse">
+            <!-- Main navigation -->
+            <ul class="nav navbar-nav">
+            
+            
+                <li >
+                    <a href="..">Getting Started</a>
+                </li>
+            
+            
+            
+                <li >
+                    <a href="../basics/">Basics</a>
+                </li>
+            
+            
+            
+                <li >
+                    <a href="../toml/">traefik.toml</a>
+                </li>
+            
+            
+            
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">User Guide <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                    
+                        
+<li >
+    <a href="../user-guide/examples/">Configuration examples</a>
+</li>
+
+                    
+                        
+<li >
+    <a href="../user-guide/swarm/">Swarm cluster</a>
+</li>
+
+                    
+                        
+<li >
+    <a href="../user-guide/swarm-mode/">Swarm mode cluster</a>
+</li>
+
+                    
+                        
+<li >
+    <a href="../user-guide/kubernetes/">Kubernetes</a>
+</li>
+
+                    
+                        
+<li >
+    <a href="../user-guide/marathon/">Marathon</a>
+</li>
+
+                    
+                        
+<li >
+    <a href="../user-guide/kv-config/">Key-value store configuration</a>
+</li>
+
+                    
+                        
+<li >
+    <a href="../user-guide/cluster/">Clustering/HA</a>
+</li>
+
+                    
+                    </ul>
+                </li>
+            
+            
+            
+                <li class="active">
+                    <a href="./">Benchmarks</a>
+                </li>
+            
+            
+            </ul>
+
+            <!-- Search, Navigation and Repo links -->
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
+                        <i class="fa fa-search"></i> Search
+                    </a>
+                </li>
+                <li >
+                    <a rel="next" href="../user-guide/cluster/">
+                        <i class="fa fa-arrow-left"></i> Previous
+                    </a>
+                </li>
+                <li class="disabled">
+                    <a rel="prev" >
+                        Next <i class="fa fa-arrow-right"></i>
+                    </a>
+                </li>
+                
+                <li>
+                    <a href="https://github.com/containous/traefik">
+                        
+                            <i class="fa fa-github"></i>
+                        
+                        GitHub
+                    </a>
+                </li>
+                
+            </ul>
+        </div>
+    </div>
+</div>
+
+        <div class="container">
+            <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
+    <ul class="nav bs-sidenav">
+    
+        <li class="main active"><a href="#benchmarks">Benchmarks</a></li>
+        
+            <li><a href="#configuration">Configuration</a></li>
+        
+            <li><a href="#setup">Setup</a></li>
+        
+            <li><a href="#results">Results</a></li>
+        
+            <li><a href="#conclusion">Conclusion</a></li>
+        
+    
+    </ul>
+</div></div>
+            <div class="col-md-9" role="main">
+
+<h1 id="benchmarks">Benchmarks</h1>
+<h2 id="configuration">Configuration</h2>
+<p>I would like to thanks <a href="https://github.com/vincentbernat">vincentbernat</a> from <a href="https://www.exoscale.ch">exoscale.ch</a> who kindly provided the infrastructure needed for the benchmarks.</p>
+<p>I used 4 VMs for the tests with the following configuration:</p>
+<ul>
+<li>32 GB RAM</li>
+<li>8 CPU Cores</li>
+<li>10 GB SSD</li>
+<li>Ubuntu 14.04 LTS 64-bit</li>
+</ul>
+<h2 id="setup">Setup</h2>
+<ol>
+<li>One VM used to launch the benchmarking tool <a href="https://github.com/wg/wrk">wrk</a></li>
+<li>One VM for traefik (v1.0.0-beta.416) / nginx (v1.4.6)</li>
+<li>Two VMs for 2 backend servers in go <a href="https://github.com/emilevauge/whoamI/">whoami</a></li>
+</ol>
+<p>Each VM has been tuned using the following limits:</p>
+<pre><code class="bash">sysctl -w fs.file-max=&quot;9999999&quot;
+sysctl -w fs.nr_open=&quot;9999999&quot;
+sysctl -w net.core.netdev_max_backlog=&quot;4096&quot;
+sysctl -w net.core.rmem_max=&quot;16777216&quot;
+sysctl -w net.core.somaxconn=&quot;65535&quot;
+sysctl -w net.core.wmem_max=&quot;16777216&quot;
+sysctl -w net.ipv4.ip_local_port_range=&quot;1025       65535&quot;
+sysctl -w net.ipv4.tcp_fin_timeout=&quot;30&quot;
+sysctl -w net.ipv4.tcp_keepalive_time=&quot;30&quot;
+sysctl -w net.ipv4.tcp_max_syn_backlog=&quot;20480&quot;
+sysctl -w net.ipv4.tcp_max_tw_buckets=&quot;400000&quot;
+sysctl -w net.ipv4.tcp_no_metrics_save=&quot;1&quot;
+sysctl -w net.ipv4.tcp_syn_retries=&quot;2&quot;
+sysctl -w net.ipv4.tcp_synack_retries=&quot;2&quot;
+sysctl -w net.ipv4.tcp_tw_recycle=&quot;1&quot;
+sysctl -w net.ipv4.tcp_tw_reuse=&quot;1&quot;
+sysctl -w vm.min_free_kbytes=&quot;65536&quot;
+sysctl -w vm.overcommit_memory=&quot;1&quot;
+ulimit -n 9999999
+</code></pre>
+
+<h3 id="nginx">Nginx</h3>
+<p>Here is the config Nginx file use <code>/etc/nginx/nginx.conf</code>:</p>
+<pre><code>user www-data;
+worker_processes auto;
+worker_rlimit_nofile 200000;
+pid /var/run/nginx.pid;
+
+events {
+    worker_connections 10000;
+    use epoll;
+    multi_accept on;
+}
+
+http {
+    sendfile on;
+    tcp_nopush on;
+    tcp_nodelay on;
+    keepalive_timeout 300;
+    keepalive_requests 10000;
+    types_hash_max_size 2048;
+
+    open_file_cache max=200000 inactive=300s; 
+    open_file_cache_valid 300s; 
+    open_file_cache_min_uses 2;
+    open_file_cache_errors on;
+
+    server_tokens off;
+    dav_methods off;
+
+    include /etc/nginx/mime.types;
+    default_type application/octet-stream;
+
+    access_log /var/log/nginx/access.log combined;
+    error_log /var/log/nginx/error.log warn;
+
+    gzip off;
+    gzip_vary off;
+
+    include /etc/nginx/conf.d/*.conf;
+    include /etc/nginx/sites-enabled/*.conf;
+}
+</code></pre>
+
+<p>Here is the Nginx vhost file used:</p>
+<pre><code>upstream whoami {
+    server IP-whoami1:80;
+    server IP-whoami2:80;
+    keepalive 300;
+}
+
+server {
+    listen 8001;
+    server_name test.traefik;
+    access_log off;
+    error_log /dev/null crit;
+    if ($host != &quot;test.traefik&quot;) {
+        return 404;
+    }
+    location / {
+        proxy_pass http://whoami;
+        proxy_http_version 1.1;
+        proxy_set_header Connection &quot;&quot;;
+    proxy_set_header  X-Forwarded-Host $host;
+    }
+}
+</code></pre>
+
+<h3 id="traefik">Traefik</h3>
+<p>Here is the <code>traefik.toml</code> file used:</p>
+<pre><code class="toml">MaxIdleConnsPerHost = 100000
+defaultEntryPoints = [&quot;http&quot;]
+
+[entryPoints]
+  [entryPoints.http]
+  address = &quot;:8000&quot;
+
+[file]
+[backends]
+  [backends.backend1]
+    [backends.backend1.servers.server1]
+    url = &quot;http://IP-whoami1:80&quot;
+    weight = 1
+    [backends.backend1.servers.server2]
+    url = &quot;http://IP-whoami2:80&quot;
+    weight = 1
+
+[frontends]
+  [frontends.frontend1]
+  backend = &quot;backend1&quot;
+    [frontends.frontend1.routes.test_1]
+    rule = &quot;Host: test.traefik&quot;
+</code></pre>
+
+<h2 id="results">Results</h2>
+<h3 id="whoami">whoami:</h3>
+<pre><code class="shell">wrk -t20 -c1000 -d60s -H &quot;Host: test.traefik&quot; --latency  http://IP-whoami:80/bench
+Running 1m test @ http://IP-whoami:80/bench
+  20 threads and 1000 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency    70.28ms  134.72ms   1.91s    89.94%
+    Req/Sec     2.92k   742.42     8.78k    68.80%
+  Latency Distribution
+     50%   10.63ms
+     75%   75.64ms
+     90%  205.65ms
+     99%  668.28ms
+  3476705 requests in 1.00m, 384.61MB read
+  Socket errors: connect 0, read 0, write 0, timeout 103
+Requests/sec:  57894.35
+Transfer/sec:      6.40MB
+</code></pre>
+
+<h3 id="nginx_1">nginx:</h3>
+<pre><code class="shell">wrk -t20 -c1000 -d60s -H &quot;Host: test.traefik&quot; --latency  http://IP-nginx:8001/bench
+Running 1m test @ http://IP-nginx:8001/bench
+  20 threads and 1000 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency   101.25ms  180.09ms   1.99s    89.34%
+    Req/Sec     1.69k   567.69     9.39k    72.62%
+  Latency Distribution
+     50%   15.46ms
+     75%  129.11ms
+     90%  302.44ms
+     99%  846.59ms
+  2018427 requests in 1.00m, 298.36MB read
+  Socket errors: connect 0, read 0, write 0, timeout 90
+Requests/sec:  33591.67
+Transfer/sec:      4.97MB
+</code></pre>
+
+<h3 id="traefik_1">traefik:</h3>
+<pre><code class="shell">wrk -t20 -c1000 -d60s -H &quot;Host: test.traefik&quot; --latency  http://IP-traefik:8000/bench
+Running 1m test @ http://IP-traefik:8000/bench
+  20 threads and 1000 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency    91.72ms  150.43ms   2.00s    90.50%
+    Req/Sec     1.43k   266.37     2.97k    69.77%
+  Latency Distribution
+     50%   19.74ms
+     75%  121.98ms
+     90%  237.39ms
+     99%  687.49ms
+  1705073 requests in 1.00m, 188.63MB read
+  Socket errors: connect 0, read 0, write 0, timeout 7
+Requests/sec:  28392.44
+Transfer/sec:      3.14MB
+</code></pre>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Traefik is obviously slower than Nginx, but not so much: Traefik can serve 28392 requests/sec and Nginx 33591 requests/sec which gives a ratio of 85%.
+Not bad for young project :) !</p>
+<p>Some areas of possible improvements:</p>
+<ul>
+<li>Use <a href="https://github.com/kavu/go_reuseport">GO_REUSEPORT</a> listener</li>
+<li>Run a separate server instance per CPU core with <code>GOMAXPROCS=1</code> (it appears during benchmarks that there is a lot more context switches with traefik than with nginx)</li>
+</ul></div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+            
+                <center>Copyright &copy; 2016-2017 Containous SAS</center>
+            
+            <center>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</center>
+        </footer>
+
+        <script src="../js/jquery-1.10.2.min.js"></script>
+        <script src="../js/bootstrap-3.0.3.min.js"></script>
+        <script src="../js/highlight.pack.js"></script>
+        <script>var base_url = '..';</script>
+        <script data-main="../mkdocs/js/search.js" src="../mkdocs/js/require.js"></script>
+        <script src="../js/base.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                        <h4 class="modal-title" id="exampleModalLabel">Search</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p>
+                            From here you can search these documents. Enter
+                            your search terms below.
+                        </p>
+                        <form role="form">
+                            <div class="form-group">
+                                <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query">
+                            </div>
+                        </form>
+                        <div id="mkdocs-search-results"></div>
+                    </div>
+                    <div class="modal-footer">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

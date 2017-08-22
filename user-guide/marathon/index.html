@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="containo.us">
+        <link rel="canonical" href="https://docs.traefik.io/user-guide/marathon/">
+        <link rel="shortcut icon" href="img/traefik.icon.png">
+        
+
+	<title>Marathon - Træfik</title>
+
+        <link href="../../css/bootstrap-custom.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome-4.0.3.css" rel="stylesheet">
+        <link rel="stylesheet" href="../../css/highlight.css">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link href="../../css/traefik.css" rel="stylesheet">
+
+        <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+            <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+        <![endif]-->
+
+        
+    </head>
+
+    <body>
+
+        <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+
+        <!-- Collapsed navigation -->
+        <div class="navbar-header">
+            <!-- Expander button -->
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+
+            <!-- Main title -->
+            <a class="navbar-brand" href="../..">Træfik</a>
+        </div>
+
+        <!-- Expanded navigation -->
+        <div class="navbar-collapse collapse">
+            <!-- Main navigation -->
+            <ul class="nav navbar-nav">
+            
+            
+                <li >
+                    <a href="../..">Getting Started</a>
+                </li>
+            
+            
+            
+                <li >
+                    <a href="../../basics/">Basics</a>
+                </li>
+            
+            
+            
+                <li >
+                    <a href="../../toml/">traefik.toml</a>
+                </li>
+            
+            
+            
+                <li class="dropdown active">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">User Guide <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                    
+                        
+<li >
+    <a href="../examples/">Configuration examples</a>
+</li>
+
+                    
+                        
+<li >
+    <a href="../swarm/">Swarm cluster</a>
+</li>
+
+                    
+                        
+<li >
+    <a href="../swarm-mode/">Swarm mode cluster</a>
+</li>
+
+                    
+                        
+<li >
+    <a href="../kubernetes/">Kubernetes</a>
+</li>
+
+                    
+                        
+<li class="active">
+    <a href="./">Marathon</a>
+</li>
+
+                    
+                        
+<li >
+    <a href="../kv-config/">Key-value store configuration</a>
+</li>
+
+                    
+                        
+<li >
+    <a href="../cluster/">Clustering/HA</a>
+</li>
+
+                    
+                    </ul>
+                </li>
+            
+            
+            
+                <li >
+                    <a href="../../benchmarks/">Benchmarks</a>
+                </li>
+            
+            
+            </ul>
+
+            <!-- Search, Navigation and Repo links -->
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
+                        <i class="fa fa-search"></i> Search
+                    </a>
+                </li>
+                <li >
+                    <a rel="next" href="../kubernetes/">
+                        <i class="fa fa-arrow-left"></i> Previous
+                    </a>
+                </li>
+                <li >
+                    <a rel="prev" href="../kv-config/">
+                        Next <i class="fa fa-arrow-right"></i>
+                    </a>
+                </li>
+                
+                <li>
+                    <a href="https://github.com/containous/traefik">
+                        
+                            <i class="fa fa-github"></i>
+                        
+                        GitHub
+                    </a>
+                </li>
+                
+            </ul>
+        </div>
+    </div>
+</div>
+
+        <div class="container">
+            <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
+    <ul class="nav bs-sidenav">
+    
+        <li class="main active"><a href="#marathon">Marathon</a></li>
+        
+    
+        <li class="main "><a href="#host-detection">Host detection</a></li>
+        
+    
+        <li class="main "><a href="#port-detection">Port detection</a></li>
+        
+    
+        <li class="main "><a href="#achieving-high-availability">Achieving high availability</a></li>
+        
+            <li><a href="#scenarios">Scenarios</a></li>
+        
+            <li><a href="#non-alternatives">(Non-)Alternatives</a></li>
+        
+    
+    </ul>
+</div></div>
+            <div class="col-md-9" role="main">
+
+<h1 id="marathon">Marathon</h1>
+<p>This guide explains how to integrate Marathon and operate the cluster in a reliable way from Traefik's standpoint.</p>
+<h1 id="host-detection">Host detection</h1>
+<p>Marathon offers multiple ways to run (Docker-containerized) applications, the most popular ones being</p>
+<ul>
+<li>BRIDGE-networked containers with dynamic high ports exposed</li>
+<li>HOST-networked containers with host machine ports</li>
+<li>containers with dedicated IP addresses (<a href="https://mesosphere.github.io/marathon/docs/ip-per-task.html">IP-per-task</a>).</li>
+</ul>
+<p>Traefik tries to detect the configured mode and route traffic to the right IP addresses. It is possible to force using task hosts with the <code>forceTaskHostname</code> option.</p>
+<p>Given the complexity of the subject, it is possible that the heuristic fails. Apart from filing an issue and waiting for the feature request / bug report to get addressed, one workaround for such situations is to customize the Marathon template file to the individual needs. (Note that this does <em>not</em> require rebuilding Traefik but only to point the <code>filename</code> configuration parameter to a customized version of the <code>marathon.tmpl</code> file on Traefik startup.)</p>
+<h1 id="port-detection">Port detection</h1>
+<p>Traefik also attempts to determine the right port (which is a <a href="https://mesosphere.github.io/marathon/docs/ports.html">non-trivial matter in Marathon</a>). Following is the order by which Traefik tries to identify the port (the first one that yields a positive result will be used):</p>
+<ol>
+<li>A arbitrary port specified through the <code>traefik.port</code> label.</li>
+<li>The task port (possibly indexed through the <code>traefik.portIndex</code> label, otherwise the first one).</li>
+<li>The port from the application's <code>portDefinitions</code> field (possibly indexed through the <code>traefik.portIndex</code> label, otherwise the first one).</li>
+<li>The port from the application's <code>ipAddressPerTask</code> field (possibly indexed through the <code>traefik.portIndex</code> label, otherwise the first one).</li>
+</ol>
+<h1 id="achieving-high-availability">Achieving high availability</h1>
+<h2 id="scenarios">Scenarios</h2>
+<p>There are three scenarios where the availability of a Marathon application could be impaired along with the risk of losing or failing requests:</p>
+<ul>
+<li>During the startup phase when Traefik already routes requests to the backend even though it has not completed its bootstrapping process yet.</li>
+<li>During the shutdown phase when Traefik still routes requests to the backend while the backend is already terminating.</li>
+<li>During a failure of the application when Traefik has not yet identified the backend as being erroneous.</li>
+</ul>
+<p>The first two scenarios are common with every rolling upgrade of an application (i.e., a new version release or configuration update).</p>
+<p>The following sub-sections describe how to resolve or mitigate each scenario.</p>
+<h3 id="startup">Startup</h3>
+<p>In general, it is possible to define <a href="https://mesosphere.github.io/marathon/docs/readiness-checks.html">readiness checks</a> (available since Marathon version 1.1) per application and have Marathon take these into account during the startup phase. The idea is that each application provides an HTTP endpoint that Marathon queries periodically during an ongoing deployment in order to mark the associated readiness check result as successful if and only if the endpoint returns a response within the configured HTTP code range. As long as the check keeps failing, Marathon will not proceed with the deployment (within the configured upgrade stategy bounds).</p>
+<p>Unfortunately, Traefik does not respect the result of the readiness check yet. Support is expected to land in a not-too-distant future release of Traefik, however, as being tracked by <a href="https://github.com/containous/traefik/issues/1559">issue 1559</a>.</p>
+<p>A current mitigation strategy is to enable <a href="http://docs.traefik.io/toml/#retry-configuration">retries</a> and make sure that a sufficient number of healthy application tasks exist so that one retry will likely hit one of those. Apart from its probabilistic nature, the workaround comes at the price of increased latency.</p>
+<h3 id="shutdown">Shutdown</h3>
+<p>It is possible to install a <a href="https://mesosphere.github.io/marathon/docs/health-checks.html">termination handler</a> (available since Marathon version 1.3) with each application whose responsibility it is to delay the shutdown process long enough until the backend has been taken out of load-balancing rotation with reasonable confidence (i.e., Traefik has received an update from the Marathon event bus, recomputes the available Marathon backends, and applies the new configuration). Specifically, each termination handler should install a signal handler listening for a SIGTERM signal and implement the following steps on signal reception:</p>
+<ol>
+<li>Disable Keep-Alive HTTP connections.</li>
+<li>Keep accepting HTTP requests for a certain period of time.</li>
+<li>Stop accepting new connections.</li>
+<li>Finish serving any in-flight requests.</li>
+<li>Shut down.</li>
+</ol>
+<p>Traefik already ignores Marathon tasks whose state does not match <code>TASK_RUNNING</code>; since terminating tasks transition into the <code>TASK_KILLING</code> and eventually <code>TASK_KILLED</code> state, there is nothing further that needs to be done on Traefik's end.</p>
+<p>How long HTTP requests should continue to be accepted in step 2 depends on how long Traefik needs to receive and process the Marathon configuration update. Under regular operational conditions, it should be on the order of seconds, with 10 seconds possibly being a good default value.</p>
+<p>Again, configuring Traefik to do retries (as discussed in the previous section) can serve as a decent workaround strategy. Paired with termination handlers, they would cover for those cases where either the termination sequence or Traefik cannot complete their part of the orchestration process in time.</p>
+<h3 id="failure">Failure</h3>
+<p>A failing application always happens unexpectedly, and hence, it is very difficult or even impossible to rule out the adversal effects categorically. Failure reasons vary broadly and could stretch from unacceptable slowness, a task crash, or a network split.</p>
+<p>There are two mitigaton efforts:</p>
+<ol>
+<li>Configure <a href="https://mesosphere.github.io/marathon/docs/health-checks.html">Marathon health checks</a> on each application.</li>
+<li>Configure Traefik health checks (possibly via the <code>traefik.backend.healthcheck.*</code> labels) and make sure they probe with proper frequency.</li>
+</ol>
+<p>The Marathon health check makes sure that applications once deemed dysfunctional are being rescheduled to different slaves. However, they might take a while to get triggered and the follow-up processes to complete. For that reason, the Treafik health check provides an additional check that responds more rapidly and does not require a configuration reload to happen. Additionally, it protects from cases that the Marathon health check may not be able to cover, such as a network split.</p>
+<h2 id="non-alternatives">(Non-)Alternatives</h2>
+<p>There are a few alternatives of varying quality that are frequently asked for. The remaining section is going to explore them along with a benefit/cost trade-off.</p>
+<h3 id="reusing-marathon-health-checks">Reusing Marathon health checks</h3>
+<p>It may seem obvious to reuse the Marathon health checks as a signal to Traefik whether an application should be taken into load-balancing rotation or not.</p>
+<p>Apart from the increased latency a failing health check may have, a major problem with this is is that Marathon does not persist the health check results. Consequently, if a master re-election occurs in the Marathon clusters, all health check results will revert to the <em>unknown</em> state, effectively causing all applications inside the cluster to become unavailable and leading to a complete cluster failure. Re-elections do not only happen during regular maintenance work (often requiring rolling upgrades of the Marathon nodes) but also when the Marathon leader fails spontaneously). As such, there is no way to handle this situation deterministically.</p>
+<p>Finally, Marathon health checks are not mandatory (the default is to use the task state as reported by Mesos), so requiring them for Traefik would raise the entry barrier for Marathon users.</p>
+<p>Traefik used to use the health check results but moved away from it as <a href="https://github.com/containous/traefik/issues/653">users reported the dramatic consequences</a>.</p>
+<h3 id="draining">Draining</h3>
+<p>Another common approach is to let a proxy drain backends that are supposed to shut down. That is, once a backend is supposed to shut down, Traefik would stop forwarding requests.</p>
+<p>On the plus side, this would not require any modifications to the application in question. However, implementing this fully within Traefik seems like a non-trivial undertaking. Additionally, the approach is less flexible compared to a custom termination handler since only the latter allows for the implementation of custom termination sequences that go beyond simple request draining (e.g., persisting a snapshot state to disk prior to terminating).</p>
+<p>The feature is currently not implemented; a request for draining in general is at <a href="https://github.com/containous/traefik/issues/41">issue 41</a>.</p></div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+            
+                <center>Copyright &copy; 2016-2017 Containous SAS</center>
+            
+            <center>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</center>
+        </footer>
+
+        <script src="../../js/jquery-1.10.2.min.js"></script>
+        <script src="../../js/bootstrap-3.0.3.min.js"></script>
+        <script src="../../js/highlight.pack.js"></script>
+        <script>var base_url = '../..';</script>
+        <script data-main="../../mkdocs/js/search.js" src="../../mkdocs/js/require.js"></script>
+        <script src="../../js/base.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                        <h4 class="modal-title" id="exampleModalLabel">Search</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p>
+                            From here you can search these documents. Enter
+                            your search terms below.
+                        </p>
+                        <form role="form">
+                            <div class="form-group">
+                                <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query">
+                            </div>
+                        </form>
+                        <div id="mkdocs-search-results"></div>
+                    </div>
+                    <div class="modal-footer">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

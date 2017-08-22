@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="Træfik Documentation">
+        <meta name="author" content="containo.us">
+        <link rel="canonical" href="https://docs.traefik.io/">
+        <link rel="shortcut icon" href="img/traefik.icon.png">
+        
+
+	<title>Træfik</title>
+
+        <link href="./css/bootstrap-custom.min.css" rel="stylesheet">
+        <link href="./css/font-awesome-4.0.3.css" rel="stylesheet">
+        <link rel="stylesheet" href="./css/highlight.css">
+        <link href="./css/base.css" rel="stylesheet">
+        <link href="./css/traefik.css" rel="stylesheet">
+
+        <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+            <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+        <![endif]-->
+
+        
+    </head>
+
+    <body>
+
+        <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+
+        <!-- Collapsed navigation -->
+        <div class="navbar-header">
+            <!-- Expander button -->
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+
+            <!-- Main title -->
+            <a class="navbar-brand" href=".">Træfik</a>
+        </div>
+
+        <!-- Expanded navigation -->
+        <div class="navbar-collapse collapse">
+            <!-- Main navigation -->
+            <ul class="nav navbar-nav">
+            
+            
+                <li class="active">
+                    <a href=".">Getting Started</a>
+                </li>
+            
+            
+            
+                <li >
+                    <a href="basics/">Basics</a>
+                </li>
+            
+            
+            
+                <li >
+                    <a href="toml/">traefik.toml</a>
+                </li>
+            
+            
+            
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">User Guide <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                    
+                        
+<li >
+    <a href="user-guide/examples/">Configuration examples</a>
+</li>
+
+                    
+                        
+<li >
+    <a href="user-guide/swarm/">Swarm cluster</a>
+</li>
+
+                    
+                        
+<li >
+    <a href="user-guide/swarm-mode/">Swarm mode cluster</a>
+</li>
+
+                    
+                        
+<li >
+    <a href="user-guide/kubernetes/">Kubernetes</a>
+</li>
+
+                    
+                        
+<li >
+    <a href="user-guide/marathon/">Marathon</a>
+</li>
+
+                    
+                        
+<li >
+    <a href="user-guide/kv-config/">Key-value store configuration</a>
+</li>
+
+                    
+                        
+<li >
+    <a href="user-guide/cluster/">Clustering/HA</a>
+</li>
+
+                    
+                    </ul>
+                </li>
+            
+            
+            
+                <li >
+                    <a href="benchmarks/">Benchmarks</a>
+                </li>
+            
+            
+            </ul>
+
+            <!-- Search, Navigation and Repo links -->
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
+                        <i class="fa fa-search"></i> Search
+                    </a>
+                </li>
+                <li class="disabled">
+                    <a rel="next" >
+                        <i class="fa fa-arrow-left"></i> Previous
+                    </a>
+                </li>
+                <li >
+                    <a rel="prev" href="basics/">
+                        Next <i class="fa fa-arrow-right"></i>
+                    </a>
+                </li>
+                
+                <li>
+                    <a href="https://github.com/containous/traefik">
+                        
+                            <i class="fa fa-github"></i>
+                        
+                        GitHub
+                    </a>
+                </li>
+                
+            </ul>
+        </div>
+    </div>
+</div>
+
+        <div class="container">
+            <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
+    <ul class="nav bs-sidenav">
+    
+        <li class="main active"><a href="#overview">Overview</a></li>
+        
+    
+        <li class="main "><a href="#quickstart">Quickstart</a></li>
+        
+    
+        <li class="main "><a href="#get-it">Get it</a></li>
+        
+            <li><a href="#binary">Binary</a></li>
+        
+            <li><a href="#docker">Docker</a></li>
+        
+    
+        <li class="main "><a href="#test-it">Test it</a></li>
+        
+    
+    </ul>
+</div></div>
+            <div class="col-md-9" role="main">
+
+<p align="center">
+<img src="img/traefik.logo.png" alt="Træfik" title="Træfik" />
+</p>
+
+<p><a href="https://travis-ci.org/containous/traefik"><img alt="Build Status" src="https://travis-ci.org/containous/traefik.svg?branch=master" /></a>
+<a href="https://docs.traefik.io"><img alt="Docs" src="https://img.shields.io/badge/docs-current-brightgreen.svg" /></a>
+<a href="http://goreportcard.com/report/containous/traefik"><img alt="Go Report Card" src="https://goreportcard.com/badge/kubernetes/helm" /></a>
+<a href="https://github.com/containous/traefik/blob/master/LICENSE.md"><img alt="License" src="https://img.shields.io/badge/license-MIT-blue.svg" /></a>
+<a href="https://traefik.herokuapp.com"><img alt="Join the chat at https://traefik.herokuapp.com" src="https://img.shields.io/badge/style-register-green.svg?style=social&amp;label=Slack" /></a>
+<a href="https://twitter.com/intent/follow?screen_name=traefikproxy"><img alt="Twitter" src="https://img.shields.io/twitter/follow/traefikproxy.svg?style=social" /></a></p>
+<p>Træfik (pronounced like <a href="https://speak-ipa.bearbin.net/speak.cgi?speak=%CB%88tr%C3%A6f%C9%AAk">traffic</a>) is a modern HTTP reverse proxy and load balancer made to deploy microservices with ease.
+It supports several backends (<a href="https://www.docker.com/">Docker</a>, <a href="https://docs.docker.com/swarm">Swarm</a>, <a href="https://mesosphere.github.io/marathon/">Mesos/Marathon</a>, <a href="https://www.consul.io/">Consul</a>, <a href="https://coreos.com/etcd/">Etcd</a>, <a href="https://zookeeper.apache.org">Zookeeper</a>, <a href="https://github.com/boltdb/bolt">BoltDB</a>, <a href="https://aws.amazon.com/ecs/">Amazon ECS</a>, <a href="https://aws.amazon.com/dynamodb/">Amazon DynamoDB</a>, Rest API, file...) to manage its configuration automatically and dynamically.</p>
+<h2 id="overview">Overview</h2>
+<p>Imagine that you have deployed a bunch of microservices on your infrastructure. You probably used a service registry (like etcd or consul) and/or an orchestrator (swarm, Mesos/Marathon) to manage all these services.
+If you want your users to access some of your microservices from the Internet, you will have to use a reverse proxy and configure it using virtual hosts or prefix paths:</p>
+<ul>
+<li>domain <code>api.domain.com</code> will point the microservice <code>api</code> in your private network</li>
+<li>path <code>domain.com/web</code> will point the microservice <code>web</code> in your private network</li>
+<li>domain <code>backoffice.domain.com</code> will point the microservices <code>backoffice</code> in your private network, load-balancing between your multiple instances</li>
+</ul>
+<p>But a microservices architecture is dynamic... Services are added, removed, killed or upgraded often, eventually several times a day.</p>
+<p>Traditional reverse-proxies are not natively dynamic. You can't change their configuration and hot-reload easily.</p>
+<p>Here enters Træfik.</p>
+<p><img alt="Architecture" src="./img/architecture.png" /></p>
+<p>Træfik can listen to your service registry/orchestrator API, and knows each time a microservice is added, removed, killed or upgraded, and can generate its configuration automatically.
+Routes to your services will be created instantly.</p>
+<p>Run it and forget it!</p>
+<h2 id="quickstart">Quickstart</h2>
+<p>You can have a quick look at Træfik in this <a href="https://www.katacoda.com/courses/traefik/deploy-load-balancer">Katacoda tutorial</a> that shows how to load balance requests between multiple Docker containers.</p>
+<p>Here is a talk given by <a href="https://github.com/errm">Ed Robinson</a> at the <a href="https://container.camp">ContainerCamp UK</a> conference.
+You will learn fundamental Træfik features and see some demos with Kubernetes.</p>
+<p><a href="https://www.youtube.com/watch?v=aFtpIShV60I"><img alt="Traefik ContainerCamp UK" src="http://img.youtube.com/vi/aFtpIShV60I/0.jpg" /></a></p>
+<p>Here is a talk (in French) given by <a href="https://github.com/emilevauge">Emile Vauge</a> at the <a href="http://www.devoxx.fr">Devoxx France 2016</a> conference. 
+You will learn fundamental Træfik features and see some demos with Docker, Mesos/Marathon and Let's Encrypt. </p>
+<p><a href="http://www.youtube.com/watch?v=QvAz9mVx5TI"><img alt="Traefik Devoxx France" src="http://img.youtube.com/vi/QvAz9mVx5TI/0.jpg" /></a></p>
+<h2 id="get-it">Get it</h2>
+<h3 id="binary">Binary</h3>
+<p>You can grab the latest binary from the <a href="https://github.com/containous/traefik/releases">releases</a> page and just run it with the <a href="https://raw.githubusercontent.com/containous/traefik/master/traefik.sample.toml">sample configuration file</a>:</p>
+<pre><code class="shell">./traefik -c traefik.toml
+</code></pre>
+
+<h3 id="docker">Docker</h3>
+<p>Using the tiny Docker image:</p>
+<pre><code class="shell">docker run -d -p 8080:8080 -p 80:80 -v $PWD/traefik.toml:/etc/traefik/traefik.toml traefik
+</code></pre>
+
+<h2 id="test-it">Test it</h2>
+<p>You can test Træfik easily using <a href="https://docs.docker.com/compose">Docker compose</a>, with this <code>docker-compose.yml</code> file in a folder named <code>traefik</code>:</p>
+<pre><code class="yaml">version: '2'
+
+services:
+  proxy:
+    image: traefik
+    command: --web --docker --docker.domain=docker.localhost --logLevel=DEBUG
+    networks:
+      - webgateway
+    ports:
+      - &quot;80:80&quot;
+      - &quot;8080:8080&quot;
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /dev/null:/traefik.toml
+
+networks:
+  webgateway:
+    driver: bridge
+</code></pre>
+
+<p>Start it from within the <code>traefik</code> folder:</p>
+<pre><code>docker-compose up -d
+</code></pre>
+<p>In a browser you may open <code>http://localhost:8080</code> to access Træfik's dashboard and observe the following magic.</p>
+<p>Now, create a folder named <code>test</code> and create a <code>docker-compose.yml</code> in it with this content:</p>
+<pre><code class="yaml">version: '2'
+
+services:
+  whoami:
+    image: emilevauge/whoami
+    networks:
+      - web
+    labels:
+      - &quot;traefik.backend=whoami&quot;
+      - &quot;traefik.frontend.rule=Host:whoami.docker.localhost&quot;
+
+networks:
+  web:
+    external:
+      name: traefik_webgateway
+</code></pre>
+
+<p>Then, start and scale it in the <code>test</code> folder:</p>
+<pre><code class="shell">docker-compose up -d
+docker-compose scale whoami=2
+</code></pre>
+
+<p>Finally, test load-balancing between the two services <code>test_whoami_1</code> and <code>test_whoami_2</code>:</p>
+<pre><code class="shell">$ curl -H Host:whoami.docker.localhost http://127.0.0.1
+Hostname: ef194d07634a
+IP: 127.0.0.1
+IP: ::1
+IP: 172.17.0.4
+IP: fe80::42:acff:fe11:4
+GET / HTTP/1.1
+Host: 172.17.0.4:80
+User-Agent: curl/7.35.0
+Accept: */*
+Accept-Encoding: gzip
+X-Forwarded-For: 172.17.0.1
+X-Forwarded-Host: 172.17.0.4:80
+X-Forwarded-Proto: http
+X-Forwarded-Server: dbb60406010d
+
+$ curl -H Host:whoami.docker.localhost http://127.0.0.1
+Hostname: 6c3c5df0c79a
+IP: 127.0.0.1
+IP: ::1
+IP: 172.17.0.3
+IP: fe80::42:acff:fe11:3
+GET / HTTP/1.1
+Host: 172.17.0.3:80
+User-Agent: curl/7.35.0
+Accept: */*
+Accept-Encoding: gzip
+X-Forwarded-For: 172.17.0.1
+X-Forwarded-Host: 172.17.0.3:80
+X-Forwarded-Proto: http
+X-Forwarded-Server: dbb60406010d
+</code></pre></div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+            
+                <center>Copyright &copy; 2016-2017 Containous SAS</center>
+            
+            <center>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</center>
+        </footer>
+
+        <script src="./js/jquery-1.10.2.min.js"></script>
+        <script src="./js/bootstrap-3.0.3.min.js"></script>
+        <script src="./js/highlight.pack.js"></script>
+        <script>var base_url = '.';</script>
+        <script data-main="./mkdocs/js/search.js" src="./mkdocs/js/require.js"></script>
+        <script src="./js/base.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                        <h4 class="modal-title" id="exampleModalLabel">Search</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p>
+                            From here you can search these documents. Enter
+                            your search terms below.
+                        </p>
+                        <form role="form">
+                            <div class="form-group">
+                                <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query">
+                            </div>
+                        </form>
+                        <div id="mkdocs-search-results"></div>
+                    </div>
+                    <div class="modal-footer">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

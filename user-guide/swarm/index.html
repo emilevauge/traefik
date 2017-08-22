@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="containo.us">
+        <link rel="canonical" href="https://docs.traefik.io/user-guide/swarm/">
+        <link rel="shortcut icon" href="img/traefik.icon.png">
+        
+
+	<title>Swarm cluster - Træfik</title>
+
+        <link href="../../css/bootstrap-custom.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome-4.0.3.css" rel="stylesheet">
+        <link rel="stylesheet" href="../../css/highlight.css">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link href="../../css/traefik.css" rel="stylesheet">
+
+        <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+            <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+        <![endif]-->
+
+        
+    </head>
+
+    <body>
+
+        <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+
+        <!-- Collapsed navigation -->
+        <div class="navbar-header">
+            <!-- Expander button -->
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+
+            <!-- Main title -->
+            <a class="navbar-brand" href="../..">Træfik</a>
+        </div>
+
+        <!-- Expanded navigation -->
+        <div class="navbar-collapse collapse">
+            <!-- Main navigation -->
+            <ul class="nav navbar-nav">
+            
+            
+                <li >
+                    <a href="../..">Getting Started</a>
+                </li>
+            
+            
+            
+                <li >
+                    <a href="../../basics/">Basics</a>
+                </li>
+            
+            
+            
+                <li >
+                    <a href="../../toml/">traefik.toml</a>
+                </li>
+            
+            
+            
+                <li class="dropdown active">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">User Guide <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                    
+                        
+<li >
+    <a href="../examples/">Configuration examples</a>
+</li>
+
+                    
+                        
+<li class="active">
+    <a href="./">Swarm cluster</a>
+</li>
+
+                    
+                        
+<li >
+    <a href="../swarm-mode/">Swarm mode cluster</a>
+</li>
+
+                    
+                        
+<li >
+    <a href="../kubernetes/">Kubernetes</a>
+</li>
+
+                    
+                        
+<li >
+    <a href="../marathon/">Marathon</a>
+</li>
+
+                    
+                        
+<li >
+    <a href="../kv-config/">Key-value store configuration</a>
+</li>
+
+                    
+                        
+<li >
+    <a href="../cluster/">Clustering/HA</a>
+</li>
+
+                    
+                    </ul>
+                </li>
+            
+            
+            
+                <li >
+                    <a href="../../benchmarks/">Benchmarks</a>
+                </li>
+            
+            
+            </ul>
+
+            <!-- Search, Navigation and Repo links -->
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
+                        <i class="fa fa-search"></i> Search
+                    </a>
+                </li>
+                <li >
+                    <a rel="next" href="../examples/">
+                        <i class="fa fa-arrow-left"></i> Previous
+                    </a>
+                </li>
+                <li >
+                    <a rel="prev" href="../swarm-mode/">
+                        Next <i class="fa fa-arrow-right"></i>
+                    </a>
+                </li>
+                
+                <li>
+                    <a href="https://github.com/containous/traefik">
+                        
+                            <i class="fa fa-github"></i>
+                        
+                        GitHub
+                    </a>
+                </li>
+                
+            </ul>
+        </div>
+    </div>
+</div>
+
+        <div class="container">
+            <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
+    <ul class="nav bs-sidenav">
+    
+        <li class="main active"><a href="#swarm-cluster">Swarm cluster</a></li>
+        
+            <li><a href="#prerequisites">Prerequisites</a></li>
+        
+            <li><a href="#cluster-provisioning">Cluster provisioning</a></li>
+        
+            <li><a href="#deploy-trfik">Deploy Træfik</a></li>
+        
+            <li><a href="#deploy-your-apps">Deploy your apps</a></li>
+        
+            <li><a href="#access-to-your-apps-through-trfik">Access to your apps through Træfik</a></li>
+        
+    
+    </ul>
+</div></div>
+            <div class="col-md-9" role="main">
+
+<h1 id="swarm-cluster">Swarm cluster</h1>
+<p>This section explains how to create a multi-host <a href="https://docs.docker.com/swarm">swarm</a> cluster using <a href="https://docs.docker.com/machine/">docker-machine</a> and how to deploy Træfik on it.
+The cluster consists of:</p>
+<ul>
+<li>2 servers</li>
+<li>1 swarm master</li>
+<li>2 swarm nodes</li>
+<li>1 <a href="https://docs.docker.com/engine/userguide/networking/dockernetworks/#an-overlay-network">overlay</a> network (multi-host networking)</li>
+</ul>
+<h2 id="prerequisites">Prerequisites</h2>
+<ol>
+<li>You need to install <a href="https://docs.docker.com/machine/">docker-machine</a></li>
+<li>You need the latest <a href="https://www.virtualbox.org/wiki/Downloads">VirtualBox</a></li>
+</ol>
+<h2 id="cluster-provisioning">Cluster provisioning</h2>
+<p>We first follow <a href="https://docs.docker.com/engine/userguide/networking/get-started-overlay/">this guide</a> to create the cluster.</p>
+<h3 id="create-machine-mh-keystore">Create machine <code>mh-keystore</code></h3>
+<p>This machine is the service registry of our cluster.</p>
+<pre><code class="shell">docker-machine create -d virtualbox mh-keystore
+</code></pre>
+
+<p>Then we install the service registry <a href="https://consul.io">Consul</a> on this machine:</p>
+<pre><code class="shell">eval &quot;$(docker-machine env mh-keystore)&quot;
+docker run -d \
+    -p &quot;8500:8500&quot; \
+    -h &quot;consul&quot; \
+    progrium/consul -server -bootstrap
+</code></pre>
+
+<h3 id="create-machine-mhs-demo0">Create machine <code>mhs-demo0</code></h3>
+<p>This machine is a swarm master and a swarm agent on it.</p>
+<pre><code class="shell">docker-machine create -d virtualbox \
+    --swarm --swarm-master \
+    --swarm-discovery=&quot;consul://$(docker-machine ip mh-keystore):8500&quot; \
+    --engine-opt=&quot;cluster-store=consul://$(docker-machine ip mh-keystore):8500&quot; \
+    --engine-opt=&quot;cluster-advertise=eth1:2376&quot; \
+    mhs-demo0
+</code></pre>
+
+<h3 id="create-machine-mhs-demo1">Create machine <code>mhs-demo1</code></h3>
+<p>This machine have a swarm agent on it.</p>
+<pre><code class="shell">docker-machine create -d virtualbox \
+    --swarm \
+    --swarm-discovery=&quot;consul://$(docker-machine ip mh-keystore):8500&quot; \
+    --engine-opt=&quot;cluster-store=consul://$(docker-machine ip mh-keystore):8500&quot; \
+    --engine-opt=&quot;cluster-advertise=eth1:2376&quot; \
+    mhs-demo1
+</code></pre>
+
+<h3 id="create-the-overlay-network">Create the overlay Network</h3>
+<p>Create the overlay network on the swarm master:</p>
+<pre><code class="shell">eval $(docker-machine env --swarm mhs-demo0)
+docker network create --driver overlay --subnet=10.0.9.0/24 my-net
+</code></pre>
+
+<h2 id="deploy-trfik">Deploy Træfik</h2>
+<p>Deploy Træfik:</p>
+<pre><code class="shell">docker $(docker-machine config mhs-demo0) run \
+    -d \
+    -p 80:80 -p 8080:8080 \
+    --net=my-net \
+    -v /var/lib/boot2docker/:/ssl \
+    traefik \
+    -l DEBUG \
+    -c /dev/null \
+    --docker \
+    --docker.domain=traefik \
+    --docker.endpoint=tcp://$(docker-machine ip mhs-demo0):3376 \
+    --docker.tls \
+    --docker.tls.ca=/ssl/ca.pem \
+    --docker.tls.cert=/ssl/server.pem \
+    --docker.tls.key=/ssl/server-key.pem \
+    --docker.tls.insecureSkipVerify \
+    --docker.watch \
+    --web
+</code></pre>
+
+<p>Let's explain this command:</p>
+<ul>
+<li><code>-p 80:80 -p 8080:8080</code>: we bind ports 80 and 8080</li>
+<li><code>--net=my-net</code>: run the container on the network my-net</li>
+<li><code>-v /var/lib/boot2docker/:/ssl</code>: mount the ssl keys generated by docker-machine</li>
+<li><code>-c /dev/null</code>: empty config file</li>
+<li><code>--docker</code>: enable docker backend</li>
+<li><code>--docker.endpoint=tcp://172.18.0.1:3376</code>: connect to the swarm master using the docker_gwbridge network</li>
+<li><code>--docker.tls</code>: enable TLS using the docker-machine keys</li>
+<li><code>--web</code>: activate the webUI on port 8080</li>
+</ul>
+<h2 id="deploy-your-apps">Deploy your apps</h2>
+<p>We can now deploy our app on the cluster, here <a href="https://github.com/emilevauge/whoami">whoami</a>, a simple web server in GO, on the network <code>my-net</code>:</p>
+<pre><code class="shell">eval $(docker-machine env --swarm mhs-demo0)
+docker run -d --name=whoami0 --net=my-net --env=&quot;constraint:node==mhs-demo0&quot; emilevauge/whoami
+docker run -d --name=whoami1 --net=my-net --env=&quot;constraint:node==mhs-demo1&quot; emilevauge/whoami
+</code></pre>
+
+<p>Check that everything is started:</p>
+<pre><code class="shell">docker ps
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                                                      NAMES
+ba2c21488299        emilevauge/whoami   &quot;/whoamI&quot;                8 seconds ago       Up 9 seconds        80/tcp                                                     mhs-demo1/whoami1
+8147a7746e7a        emilevauge/whoami   &quot;/whoamI&quot;                19 seconds ago      Up 20 seconds       80/tcp                                                     mhs-demo0/whoami0
+8fbc39271b4c        traefik             &quot;/traefik -l DEBUG -c&quot;   36 seconds ago      Up 37 seconds       192.168.99.101:80-&gt;80/tcp, 192.168.99.101:8080-&gt;8080/tcp   mhs-demo0/serene_bhabha
+</code></pre>
+
+<h2 id="access-to-your-apps-through-trfik">Access to your apps through Træfik</h2>
+<pre><code class="shell">curl -H Host:whoami0.traefik http://$(docker-machine ip mhs-demo0)
+Hostname: 8147a7746e7a
+IP: 127.0.0.1
+IP: ::1
+IP: 10.0.9.3
+IP: fe80::42:aff:fe00:903
+IP: 172.18.0.3
+IP: fe80::42:acff:fe12:3
+GET / HTTP/1.1
+Host: 10.0.9.3:80
+User-Agent: curl/7.35.0
+Accept: */*
+Accept-Encoding: gzip
+X-Forwarded-For: 192.168.99.1
+X-Forwarded-Host: 10.0.9.3:80
+X-Forwarded-Proto: http
+X-Forwarded-Server: 8fbc39271b4c
+
+curl -H Host:whoami1.traefik http://$(docker-machine ip mhs-demo0)
+Hostname: ba2c21488299
+IP: 127.0.0.1
+IP: ::1
+IP: 10.0.9.4
+IP: fe80::42:aff:fe00:904
+IP: 172.18.0.2
+IP: fe80::42:acff:fe12:2
+GET / HTTP/1.1
+Host: 10.0.9.4:80
+User-Agent: curl/7.35.0
+Accept: */*
+Accept-Encoding: gzip
+X-Forwarded-For: 192.168.99.1
+X-Forwarded-Host: 10.0.9.4:80
+X-Forwarded-Proto: http
+X-Forwarded-Server: 8fbc39271b4c
+</code></pre>
+
+<p><img alt="" src="http://i.giphy.com/ujUdrdpX7Ok5W.gif" /></p></div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+            
+                <center>Copyright &copy; 2016-2017 Containous SAS</center>
+            
+            <center>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</center>
+        </footer>
+
+        <script src="../../js/jquery-1.10.2.min.js"></script>
+        <script src="../../js/bootstrap-3.0.3.min.js"></script>
+        <script src="../../js/highlight.pack.js"></script>
+        <script>var base_url = '../..';</script>
+        <script data-main="../../mkdocs/js/search.js" src="../../mkdocs/js/require.js"></script>
+        <script src="../../js/base.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                        <h4 class="modal-title" id="exampleModalLabel">Search</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p>
+                            From here you can search these documents. Enter
+                            your search terms below.
+                        </p>
+                        <form role="form">
+                            <div class="form-group">
+                                <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query">
+                            </div>
+                        </form>
+                        <div id="mkdocs-search-results"></div>
+                    </div>
+                    <div class="modal-footer">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

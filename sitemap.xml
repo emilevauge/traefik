@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+    
+    <url>
+     <loc>https://docs.traefik.io/</loc>
+     <lastmod>2017-08-22</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    
+
+    
+    <url>
+     <loc>https://docs.traefik.io/basics/</loc>
+     <lastmod>2017-08-22</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    
+
+    
+    <url>
+     <loc>https://docs.traefik.io/toml/</loc>
+     <lastmod>2017-08-22</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    
+
+    
+        
+    <url>
+     <loc>https://docs.traefik.io/user-guide/examples/</loc>
+     <lastmod>2017-08-22</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>https://docs.traefik.io/user-guide/swarm/</loc>
+     <lastmod>2017-08-22</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>https://docs.traefik.io/user-guide/swarm-mode/</loc>
+     <lastmod>2017-08-22</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>https://docs.traefik.io/user-guide/kubernetes/</loc>
+     <lastmod>2017-08-22</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>https://docs.traefik.io/user-guide/marathon/</loc>
+     <lastmod>2017-08-22</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>https://docs.traefik.io/user-guide/kv-config/</loc>
+     <lastmod>2017-08-22</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>https://docs.traefik.io/user-guide/cluster/</loc>
+     <lastmod>2017-08-22</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    
+
+    
+    <url>
+     <loc>https://docs.traefik.io/benchmarks/</loc>
+     <lastmod>2017-08-22</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    
+
+</urlset>
