@@ -62,10 +62,12 @@ These are configurable, and where the configuration says "trust this", Traefik t
   documented. Reachability in a deployment that has not applied that documentation is not a
   vulnerability in Traefik.
 - **The Kubernetes Ingress-NGINX provider.** This provider's contract is annotation compatibility with
-  ingress-nginx. Where it faithfully reproduces upstream ingress-nginx semantics, we keep the
-  compatible behaviour **even when the upstream outcome is insecure**, and we fix the documentation
-  instead. Check the upstream behaviour first: if it matches, expect a documentation change rather than
-  an advisory.
+  ingress-nginx. Where it faithfully reproduces documented upstream semantics, we keep the compatible
+  behaviour **even when the upstream outcome is insecure**, and we improve the documentation instead:
+  changing it would silently break the migrations the provider exists to serve. Check the upstream
+  behaviour first. This covers semantics the operator opted into, and it does **not** cover
+  authentication or mTLS enforcement silently not happening: where the provider fails open, that is a
+  vulnerability.
 
 ### What Is in Scope
 
@@ -88,7 +90,8 @@ Some reports describe real defects that we fix, often at high priority, but that
 security advisory or a CVE, because they do not cross the boundary described above. We say so
 explicitly rather than leaving it implicit, and we will point at this section when we close a report.
 
-The recurring classes, from our own triage history:
+The recurring classes are below, and each one is developed, with the neighbouring variant we do treat as
+a vulnerability, in [Security Decisions](./security-decisions.md).
 
 - **By design, or the operator's responsibility.** The largest class by far. See the trust assumptions
   above.
