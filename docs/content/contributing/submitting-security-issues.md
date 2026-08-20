@@ -22,89 +22,52 @@ will be fixed without creating a CVE.
 ## Threat Model
 
 Traefik is an edge router. Its security boundary sits between **untrusted network clients** and the
-services it routes to. Whether a report is a vulnerability depends on which side of that boundary the
-attacker starts from, and the assumptions below are what we use to decide.
+services it routes to. A report is a vulnerability when an **unprivileged, untrusted client crosses that
+boundary**. Reports that start from the other side of it describe bugs, and we fix bugs.
 
-This threat model applies to reports submitted on or after **1 September 2026**. It describes positions
-we already apply consistently; publishing them is meant to save reporters the work of rediscovering them.
+This threat model applies to reports submitted on or after **1 September 2026**. It states positions we
+already apply; publishing them is meant to save you the work of rediscovering them.
 
-### What Traefik Trusts by Design
+### What Traefik Trusts
 
-- **The configuration, and every provider that supplies it.** Static configuration, dynamic
-  configuration, Kubernetes CRDs and Ingress objects, container labels, files, and KV stores are trusted
-  input. Anyone able to write configuration that Traefik reads already controls routing: they can
-  redirect traffic, terminate TLS, or remove a middleware, by design. **A report whose precondition is
-  the ability to write configuration is not a vulnerability.**
-- **The internal configuration keyspace.** On a shared instance, the keyspace naming routers, services
-  and middlewares is not a tenant isolation boundary. Collisions and cross-references inside it are
-  hardening opportunities, treated as defence in depth, and do not receive an advisory.
+- **The configuration, and every provider that supplies it**: static and dynamic configuration,
+  Kubernetes objects, container labels, files, and KV stores. Anyone able to write configuration that
+  Traefik reads already controls routing, and can redirect traffic, terminate TLS, or remove a
+  middleware, by design.
 - **Operators and cluster administrators.** A report requiring operator, cluster-admin, or equivalent
-  privilege does not cross a boundary. In Kubernetes specifically, an actor who can create or edit the
-  `Ingress`, `IngressRoute` or `TraefikService` objects involved already controls routing in that
-  namespace, so a collision or shadowing they must author themselves is a bug, not a boundary crossing.
+  privilege does not cross the boundary.
+- **Trust the operator has declared.** Where the configuration says a client, a namespace or a
+  forwarding header is trusted, Traefik trusts it. Such decisions are taken **once, at the entrypoint,
+  before any middleware runs**, and are not re-litigated per middleware.
+- **The internal configuration keyspace** is not a tenant isolation boundary on a shared instance.
+  Hardening it is defence in depth.
 
-### Boundaries the Operator Controls
+### What Crosses the Boundary
 
-These are configurable, and where the configuration says "trust this", Traefik trusts it.
+With no configuration-write access and no operator privilege required:
 
-- **Client-supplied forwarding headers.** Traefik's trust boundary for `X-Forwarded-*` and `Forwarded`
-  is **entrypoint-level**: `forwardedHeaders.trustedIPs` and `forwardedHeaders.insecure` decide once,
-  at the entrypoint, before any middleware runs, whether a client's forwarding headers are trusted.
-  We deliberately do not re-decide that per middleware. A middleware that passes through a header the
-  entrypoint accepted is behaving as designed. The one shape that is in scope is a path that
-  **reintroduces or reconstructs a value after entrypoint sanitisation**.
-- **Explicitly opt-in permissive settings.** Behaviour reachable only after enabling a documented
-  option that widens handling is the documented contract of that option, not a defect. This includes
-  `allowEncodedSlash` and encoded-character handling, snippet annotations, cross-provider namespace
-  references, and error request headers. Where a permissive default exists for compatibility, that is a
-  deliberate decision, changed only at a major version.
-- **Dashboard and API exposure.** Securing the dashboard and API is the operator's responsibility, as
-  documented. Reachability in a deployment that has not applied that documentation is not a
-  vulnerability in Traefik.
-- **The Kubernetes Ingress-NGINX provider.** This provider's contract is annotation compatibility with
-  ingress-nginx. Where it faithfully reproduces documented upstream semantics, we keep the compatible
-  behaviour **even when the upstream outcome is insecure**, and we improve the documentation instead:
-  changing it would silently break the migrations the provider exists to serve. Check the upstream
-  behaviour first. This covers semantics the operator opted into, and it does **not** cover
-  authentication or mTLS enforcement silently not happening: where the provider fails open, that is a
-  vulnerability.
-
-### What Is in Scope
-
-Reports that cross the boundary from an unprivileged, untrusted client, with no configuration-write and
-no operator privilege required:
-
-- **Routing and matching bypass.** An untrusted request reaching a router, service or backend the
-  configuration does not grant it. Path normalization and encoding differentials belong here when the
-  transformed path actually reaches the backend, with stock entrypoint defaults.
-- **Authentication or authorization middleware failing open**, or being bypassable, under a
-  configuration that a reasonable reading of the documentation would call correct.
-- **Loss of confidentiality or integrity of traffic Traefik terminates or proxies**, including
-  credential and secret exposure, and mTLS or allow-list enforcement that does not hold.
+- **Routing or matching bypass**: an untrusted request reaching a router, service or backend the
+  configuration does not grant it.
+- **Authentication or authorization that fails open** or is bypassable under a configuration a
+  reasonable reading of the documentation would call correct.
+- **Loss of confidentiality or integrity of proxied traffic**, including credential exposure and TLS or
+  mTLS enforcement that does not hold.
 - **Remote crash or unbounded resource consumption** reachable from unauthenticated requests.
 - **Escalation across a boundary the configuration explicitly established.**
 
+### Where the Line Falls in Practice
+
+A boundary stated this briefly does not resolve a concrete report on its own. The surfaces where we
+have already settled a position, each with the neighbouring variant we **do** treat as a vulnerability
+and the CVEs that prove it, are on the [Security Decisions](./security-decisions.md) page. Check your
+finding there before submitting.
+
 ## Handled as a Bug, Without an Advisory
 
-Some reports describe real defects that we fix, often at high priority, but that do not receive a
-security advisory or a CVE, because they do not cross the boundary described above. We say so
-explicitly rather than leaving it implicit, and we will point at this section when we close a report.
-
-The recurring classes are below, and each one is developed, with the neighbouring variant we do treat as
-a vulnerability, in [Security Decisions](./security-decisions.md).
-
-- **By design, or the operator's responsibility.** The largest class by far. See the trust assumptions
-  above.
-- **A variant or duplicate of an issue already tracked or published.** The fix lands under the original
-  advisory, and you are credited there if it results in a CVE.
-- **Behaviour matching comparable projects.** Where Traefik behaves as ingress-nginx or HAProxy does,
-  we do not treat it as a Traefik-specific vulnerability. We will show the comparison.
-- **Non-GA code only.** Vulnerabilities in release candidates, betas, or development branches are fixed
-  without a CVE, as stated above.
-- **Dependency findings that are not reachable.** A dependency or Go standard library CVE whose
-  vulnerable code path Traefik does not reach, or reaches only at build time, is not an exposure. We
-  confirm reachability with `govulncheck`.
-- **No working proof of concept, or no reply.** See the submission requirements below.
+Some reports describe real defects that we fix, often at high priority, but that do not receive an
+advisory or a CVE, because they do not cross the boundary above. We say so explicitly rather than
+leaving it implicit, and we will point at a specific entry in
+[Security Decisions](./security-decisions.md) when we close a report on these grounds.
 
 ## Report a Vulnerability
 
