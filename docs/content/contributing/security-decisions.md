@@ -46,13 +46,13 @@ or on one backend's own re-interpretation of a character the standard permits:
 Confirm the bypass against a normalizing backend with stock entrypoint configuration before submitting.
 
 **Decided in this class.**
-[CVE-2026-48020](https://www.cve.org/CVERecord?id=CVE-2026-48020) (StripPrefix route-level auth bypass),
-[CVE-2026-40912](https://www.cve.org/CVERecord?id=CVE-2026-40912) (StripPrefixRegex, Path/RawPath
-desync), [CVE-2026-33186](https://www.cve.org/CVERecord?id=CVE-2026-33186),
-[CVE-2025-66490](https://www.cve.org/CVERecord?id=CVE-2025-66490) (router plus middleware rules),
-[CVE-2025-47952](https://www.cve.org/CVERecord?id=CVE-2025-47952),
-[CVE-2025-32431](https://www.cve.org/CVERecord?id=CVE-2025-32431) (path matchers),
-[CVE-2023-47106](https://www.cve.org/CVERecord?id=CVE-2023-47106) (URL fragment), and
+[GHSA-xf64-8mw2-4gr2](https://github.com/traefik/traefik/security/advisories/GHSA-xf64-8mw2-4gr2) (StripPrefix route-level auth bypass),
+[GHSA-6jwx-7vp4-9847](https://github.com/traefik/traefik/security/advisories/GHSA-6jwx-7vp4-9847) (StripPrefixRegex, Path/RawPath
+desync), [GHSA-46wh-3698-f2cx](https://github.com/traefik/traefik/security/advisories/GHSA-46wh-3698-f2cx) (dot-segment bypass in strip-prefix middleware),
+[GHSA-gm3x-23wp-hc2c](https://github.com/traefik/traefik/security/advisories/GHSA-gm3x-23wp-hc2c) (router plus middleware rules),
+[GHSA-vrch-868g-9jx5](https://github.com/traefik/traefik/security/advisories/GHSA-vrch-868g-9jx5) (traversal via URL encoding),
+[GHSA-6p68-w45g-48j7](https://github.com/traefik/traefik/security/advisories/GHSA-6p68-w45g-48j7) (path matchers),
+[GHSA-fvhj-4qfh-q2hm](https://github.com/traefik/traefik/security/advisories/GHSA-fvhj-4qfh-q2hm) (URL fragment), and
 [GHSA-cxjq-mrr5-89rv](https://github.com/traefik/traefik/security/advisories/GHSA-cxjq-mrr5-89rv)
 (ReplacePathRegex).
 
@@ -84,17 +84,17 @@ that does not repeat a strip is **not automatically** an incomplete fix.
 primitive, we have published it as one.
 
 **Decided in this class.**
-[CVE-2026-54763](https://www.cve.org/CVERecord?id=CVE-2026-54763) (an accepted incomplete fix, the
+[GHSA-x677-9fxg-v5c5](https://github.com/traefik/traefik/security/advisories/GHSA-x677-9fxg-v5c5) (an accepted incomplete fix, the
 `headerField` underscore variant across two earlier cohorts),
-[CVE-2026-39858](https://www.cve.org/CVERecord?id=CVE-2026-39858) (Forwarded alias spoofing),
-[CVE-2026-33433](https://www.cve.org/CVERecord?id=CVE-2026-33433) (non-canonical `headerField`),
-[CVE-2026-35051](https://www.cve.org/CVERecord?id=CVE-2026-35051)
+[GHSA-5m6w-wvh7-57vm](https://github.com/traefik/traefik/security/advisories/GHSA-5m6w-wvh7-57vm) (Forwarded alias spoofing),
+[GHSA-qr99-7898-vr7c](https://github.com/traefik/traefik/security/advisories/GHSA-qr99-7898-vr7c) (non-canonical `headerField`),
+[GHSA-6384-m2mw-rf54](https://github.com/traefik/traefik/security/advisories/GHSA-6384-m2mw-rf54)
 (`trustForwardHeader=false` still honouring a spoofed prefix),
-[CVE-2026-54764](https://www.cve.org/CVERecord?id=CVE-2026-54764),
-[CVE-2026-29054](https://www.cve.org/CVERecord?id=CVE-2026-29054) and
-[CVE-2024-45410](https://www.cve.org/CVERecord?id=CVE-2024-45410) (Connection header abused to strip
-`X-Forwarded-*`), [CVE-2024-52003](https://www.cve.org/CVERecord?id=CVE-2024-52003) and
-[CVE-2020-15129](https://www.cve.org/CVERecord?id=CVE-2020-15129).
+[GHSA-3q9r-p662-5j8m](https://github.com/traefik/traefik/security/advisories/GHSA-3q9r-p662-5j8m) (ForwardAuth trusting a spoofed port),
+[GHSA-92mv-8f8w-wq52](https://github.com/traefik/traefik/security/advisories/GHSA-92mv-8f8w-wq52) (case-sensitive Connection header) and
+[GHSA-62c8-mh53-4cqv](https://github.com/traefik/traefik/security/advisories/GHSA-62c8-mh53-4cqv) (Connection header abused to strip
+`X-Forwarded-*`), [GHSA-h924-8g65-j9wg](https://github.com/traefik/traefik/security/advisories/GHSA-h924-8g65-j9wg) (open redirect via prefix) and
+[GHSA-6qq8-5wq3-86rp](https://github.com/traefik/traefik/security/advisories/GHSA-6qq8-5wq3-86rp) (prefix header not validated).
 
 ## TLS and mTLS Enforcement
 
@@ -112,15 +112,15 @@ operator's choice and not a defect. In scope is Traefik **not applying** the str
 the operator did set, or applying it on one protocol but not another.
 
 **Decided in this class.**
-[CVE-2026-53622](https://www.cve.org/CVERecord?id=CVE-2026-53622) (HTTP/3, exact SNI lookup for
-wildcard and mixed-case hosts), [CVE-2026-48491](https://www.cve.org/CVERecord?id=CVE-2026-48491)
+[GHSA-9cr8-q42q-g8m7](https://github.com/traefik/traefik/security/advisories/GHSA-9cr8-q42q-g8m7) (HTTP/3, exact SNI lookup for
+wildcard and mixed-case hosts), [GHSA-5r4w-85f3-pw66](https://github.com/traefik/traefik/security/advisories/GHSA-5r4w-85f3-pw66)
 (SNICheck ignoring wildcard mappings, domain-fronted bypass),
-[CVE-2026-32305](https://www.cve.org/CVERecord?id=CVE-2026-32305) (fragmented ClientHello, pre-SNI
-fallback to the default), [CVE-2025-68121](https://www.cve.org/CVERecord?id=CVE-2025-68121) (ClientAuth
-on HTTP/3), [CVE-2024-39321](https://www.cve.org/CVERecord?id=CVE-2024-39321) (IP allow-lists bypassed
-via QUIC 0-RTT early data), [CVE-2022-46153](https://www.cve.org/CVERecord?id=CVE-2022-46153) (routes
+[GHSA-wvvq-wgcr-9q48](https://github.com/traefik/traefik/security/advisories/GHSA-wvvq-wgcr-9q48) (fragmented ClientHello, pre-SNI
+fallback to the default), [GHSA-gv8r-9rw9-9697](https://github.com/traefik/traefik/security/advisories/GHSA-gv8r-9rw9-9697) (ClientAuth
+on HTTP/3), [GHSA-gxrv-wf35-62w9](https://github.com/traefik/traefik/security/advisories/GHSA-gxrv-wf35-62w9) (IP allow-lists bypassed
+via QUIC 0-RTT early data), [GHSA-468w-8x39-gj5v](https://github.com/traefik/traefik/security/advisories/GHSA-468w-8x39-gj5v) (routes
 exposed with an empty `TLSOption`) and
-[CVE-2022-23632](https://www.cve.org/CVERecord?id=CVE-2022-23632).
+[GHSA-hrhx-6h34-j5hc](https://github.com/traefik/traefik/security/advisories/GHSA-hrhx-6h34-j5hc) (wrong TLS configuration selected).
 
 ## Kubernetes References Across Namespaces and Providers
 
@@ -140,15 +140,15 @@ create or edit the Kubernetes objects involved is not a boundary crossing: that 
 routing in the namespace.
 
 **Decided in this class.**
-[CVE-2026-71325](https://www.cve.org/CVERecord?id=CVE-2026-71325) (`allowCrossNamespace=false` bypassed
-via `@kubernetescrd`), [CVE-2026-54761](https://www.cve.org/CVERecord?id=CVE-2026-54761)
+[GHSA-62fc-8686-hfmq](https://github.com/traefik/traefik/security/advisories/GHSA-62fc-8686-hfmq) (`allowCrossNamespace=false` bypassed
+via `@kubernetescrd`), [GHSA-3g6v-2r68-prfc](https://github.com/traefik/traefik/security/advisories/GHSA-3g6v-2r68-prfc)
 (`crossProviderNamespaces` allow-list defeated),
-[CVE-2026-65602](https://www.cve.org/CVERecord?id=CVE-2026-65602),
-[CVE-2026-65601](https://www.cve.org/CVERecord?id=CVE-2026-65601) (ExtensionRef namespace confusion),
-[CVE-2026-41174](https://www.cve.org/CVERecord?id=CVE-2026-41174) (cross-namespace middleware binding),
-[CVE-2026-44774](https://www.cve.org/CVERecord?id=CVE-2026-44774) (`rest@internal` reachable as a
-backend), [CVE-2026-32695](https://www.cve.org/CVERecord?id=CVE-2026-32695) and
-[CVE-2026-29777](https://www.cve.org/CVERecord?id=CVE-2026-29777) (rule injection through unescaped
+[GHSA-42cj-m3vj-89wv](https://github.com/traefik/traefik/security/advisories/GHSA-42cj-m3vj-89wv) (IngressRouteTCP ServersTransport),
+[GHSA-qq9q-x9w4-chhj](https://github.com/traefik/traefik/security/advisories/GHSA-qq9q-x9w4-chhj) (ExtensionRef namespace confusion),
+[GHSA-xhjw-95fp-8vgq](https://github.com/traefik/traefik/security/advisories/GHSA-xhjw-95fp-8vgq) (cross-namespace middleware binding),
+[GHSA-96qj-4jj5-wcjc](https://github.com/traefik/traefik/security/advisories/GHSA-96qj-4jj5-wcjc) (`rest@internal` reachable as a
+backend), [GHSA-67jx-r9pv-98rj](https://github.com/traefik/traefik/security/advisories/GHSA-67jx-r9pv-98rj) (host restriction bypassed) and
+[GHSA-8q2w-wr49-whqj](https://github.com/traefik/traefik/security/advisories/GHSA-8q2w-wr49-whqj) (rule injection through unescaped
 values in Ingress and HTTPRoute).
 
 ## Generated Keys and Shared State
@@ -170,12 +170,12 @@ one confined inside a single credential cache with no cross-tenant reach is low.
 vulnerabilities.
 
 **Decided in this class.**
-[CVE-2026-71327](https://www.cve.org/CVERecord?id=CVE-2026-71327) (Gateway API route identity collision,
+[GHSA-fgjj-px3w-67xx](https://github.com/traefik/traefik/security/advisories/GHSA-fgjj-px3w-67xx) (Gateway API route identity collision,
 cross-namespace backend hijacking, high),
-[CVE-2026-71326](https://www.cve.org/CVERecord?id=CVE-2026-71326) (BasicAuth singleflight key collision,
-low), [CVE-2026-54765](https://www.cve.org/CVERecord?id=CVE-2026-54765) (backendRef filters leaking
+[GHSA-6765-c87h-8mrf](https://github.com/traefik/traefik/security/advisories/GHSA-6765-c87h-8mrf) (BasicAuth singleflight key collision,
+low), [GHSA-6p8f-p8j2-rqmv](https://github.com/traefik/traefik/security/advisories/GHSA-6p8f-p8j2-rqmv) (backendRef filters leaking
 across routes sharing a `Service:port`) and
-[CVE-2026-71324](https://www.cve.org/CVERecord?id=CVE-2026-71324) (cross-user response poisoning through
+[GHSA-3ccp-42pg-hgv6](https://github.com/traefik/traefik/security/advisories/GHSA-3ccp-42pg-hgv6) (cross-user response poisoning through
 the shared backend keep-alive pool).
 
 ## Ingress-NGINX Provider Compatibility
@@ -196,8 +196,8 @@ interpolation differences.
 faithfully reproducing an insecure upstream default, that is a vulnerability.
 
 **Decided in this class.**
-[CVE-2026-54762](https://www.cve.org/CVERecord?id=CVE-2026-54762) (fails open when `auth-secret`
-resolution fails), [CVE-2025-66491](https://www.cve.org/CVERecord?id=CVE-2025-66491) (inverted TLS
+[GHSA-4mr2-fg2p-w63c](https://github.com/traefik/traefik/security/advisories/GHSA-4mr2-fg2p-w63c) (fails open when `auth-secret`
+resolution fails), [GHSA-7vww-mvcr-x6vj](https://github.com/traefik/traefik/security/advisories/GHSA-7vww-mvcr-x6vj) (inverted TLS
 verification logic, so client certificates were not verified) and
 [GHSA-8rxv-jg7p-wvg3](https://github.com/traefik/traefik/security/advisories/GHSA-8rxv-jg7p-wvg3)
 (`rewrite-target` path traversal defeating route-level authentication).
@@ -215,11 +215,11 @@ destination the operator did not authorise.
 operator's decision. The middleware failing to deliver what its documentation promises is ours.
 
 **Decided in this class.**
-[CVE-2026-41263](https://www.cve.org/CVERecord?id=CVE-2026-41263) and
-[CVE-2026-32595](https://www.cve.org/CVERecord?id=CVE-2026-32595) (BasicAuth timing side channels,
-username enumeration), [CVE-2026-41181](https://www.cve.org/CVERecord?id=CVE-2026-41181) (Errors
+[GHSA-6x2q-h3cr-8j2h](https://github.com/traefik/traefik/security/advisories/GHSA-6x2q-h3cr-8j2h) (BasicAuth timing side channel) and
+[GHSA-g3hg-j4jv-cwfr](https://github.com/traefik/traefik/security/advisories/GHSA-g3hg-j4jv-cwfr) (BasicAuth timing side channels,
+username enumeration), [GHSA-p6hg-qh38-555r](https://github.com/traefik/traefik/security/advisories/GHSA-p6hg-qh38-555r) (Errors
 middleware forwarding `Authorization` and `Cookie` to a separate service) and
-[CVE-2022-23469](https://www.cve.org/CVERecord?id=CVE-2022-23469) (`Authorization` in debug logs).
+[GHSA-h2ph-vhm7-g4hp](https://github.com/traefik/traefik/security/advisories/GHSA-h2ph-vhm7-g4hp) (`Authorization` in debug logs).
 
 ## Availability and Resource Consumption
 
@@ -235,15 +235,15 @@ which code reading gets wrong in both directions. A resource claim with no repro
 environment cannot be assessed, and we will ask for one.
 
 **Decided in this class.**
-[CVE-2026-27141](https://www.cve.org/CVERecord?id=CVE-2026-27141) (HTTP/2 frames panicking the server),
-[CVE-2026-26998](https://www.cve.org/CVERecord?id=CVE-2026-26998) (ForwardAuth unbounded response body),
-[CVE-2026-26999](https://www.cve.org/CVERecord?id=CVE-2026-26999) and
-[CVE-2026-22045](https://www.cve.org/CVERecord?id=CVE-2026-22045) (handshake stalls without timeouts),
-[CVE-2026-25949](https://www.cve.org/CVERecord?id=CVE-2026-25949) (`readTimeout` bypassed via STARTTLS),
-[CVE-2024-28869](https://www.cve.org/CVERecord?id=CVE-2024-28869),
-[CVE-2023-29013](https://www.cve.org/CVERecord?id=CVE-2023-29013),
-[CVE-2022-39271](https://www.cve.org/CVERecord?id=CVE-2022-39271) and
-[CVE-2023-47124](https://www.cve.org/CVERecord?id=CVE-2023-47124) (ACME challenge amplification).
+[GHSA-4hjq-9h5c-252j](https://github.com/traefik/traefik/security/advisories/GHSA-4hjq-9h5c-252j) (HTTP/2 frames panicking the server),
+[GHSA-fw45-f5q2-2p4x](https://github.com/traefik/traefik/security/advisories/GHSA-fw45-f5q2-2p4x) (ForwardAuth unbounded response body),
+[GHSA-xw98-5q62-jx94](https://github.com/traefik/traefik/security/advisories/GHSA-xw98-5q62-jx94) (stalled TCP router connections) and
+[GHSA-cwjm-3f7h-9hwq](https://github.com/traefik/traefik/security/advisories/GHSA-cwjm-3f7h-9hwq) (handshake stalls without timeouts),
+[GHSA-89p3-4642-cr2w](https://github.com/traefik/traefik/security/advisories/GHSA-89p3-4642-cr2w) (`readTimeout` bypassed via STARTTLS),
+[GHSA-4vwx-54mw-vqfw](https://github.com/traefik/traefik/security/advisories/GHSA-4vwx-54mw-vqfw) (Content-Length handling),
+[GHSA-7hj9-rv74-5g92](https://github.com/traefik/traefik/security/advisories/GHSA-7hj9-rv74-5g92) (header parsing),
+[GHSA-c6hx-pjc3-7fqr](https://github.com/traefik/traefik/security/advisories/GHSA-c6hx-pjc3-7fqr) (HTTP/2 connection management) and
+[GHSA-8g85-whqh-cr2f](https://github.com/traefik/traefik/security/advisories/GHSA-8g85-whqh-cr2f) (ACME challenge amplification).
 
 ## Configuration the Operator Controls
 
